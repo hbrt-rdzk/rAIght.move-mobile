@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.raightmove.raightmove.ui.theme.RAIghtmoveTheme
+import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
