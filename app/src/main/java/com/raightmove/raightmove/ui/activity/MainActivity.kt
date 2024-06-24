@@ -19,38 +19,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raightmove.raightmove.ui.theme.RAIghtmoveTheme
-import com.raightmove.raightmove.viewmodel.CameraViewModel
+import com.raightmove.raightmove.viewmodels.CameraViewModel
 
-const val CAMERA_PERMISSION_REQUEST_CODE = 100
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkAppPermission()
+
         enableEdgeToEdge()
         setContent {
             RAIghtmoveTheme {
                 MainScreen()
             }
-        }
-    }
-
-    private fun checkAppPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERMISSION_REQUEST_CODE
-            )
-        } else {
-            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
         }
     }
 }
