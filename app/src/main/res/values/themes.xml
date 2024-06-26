@@ -2,6 +2,7 @@
 <resources>
 
     <style name="Theme.RAIghtmove" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/black</item>
         <item name="android:fontFamily">@font/font</item>
         <item name="android:textAppearance">@style/CustomTextAppearance</item>
     </style>
