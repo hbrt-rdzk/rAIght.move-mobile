@@ -9,17 +9,22 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
+import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executors
 
 class CameraViewModel : ViewModel() {
     private var previewViewRef: WeakReference<PreviewView>? = null
     private var poseLandmarker: PoseLandmarker? = null
+    private val _landmarks = MutableLiveData<PoseLandmarkerResult>()
+    val landmarks: LiveData<PoseLandmarkerResult> get() = _landmarks
 
     fun setPreviewView(previewView: PreviewView) {
         previewViewRef = WeakReference(previewView)
@@ -77,8 +82,10 @@ class CameraViewModel : ViewModel() {
 
         val mpImage = BitmapImageBuilder(bitmapImage).build()
         val result = poseLandmarker?.detect(mpImage)
-        println(result)
-
+        println(result?.landmarks())
+        result?.let {
+            _landmarks.postValue(it)
+        }
         imageProxy.close()
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -49,6 +50,7 @@ fun LoginScreen(navController: NavController) {
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
+            textStyle = TextStyle(color = Color.White),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedLabelColor = Color.White,
@@ -62,6 +64,7 @@ fun LoginScreen(navController: NavController) {
             onValueChange = { password = it },
             label = { Text("Password (6+ characters)") },
             modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.White),
             visualTransformation = PasswordVisualTransformation(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedLabelColor = Color.White,

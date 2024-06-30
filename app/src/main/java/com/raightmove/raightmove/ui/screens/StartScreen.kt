@@ -43,7 +43,8 @@ fun StartScreen(navController: NavController) {
             .background(Color.Black)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center)
+        verticalArrangement = Arrangement.Center
+    )
     {
         Icon(
             painter = painterResource(id = R.mipmap.ic_launcher_monochrome),
