@@ -26,8 +26,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import com.raightmove.raightmove.ui.components.DrawLandmarks
 import com.raightmove.raightmove.viewmodels.CameraViewModel
+import androidx.compose.runtime.State
 
 @Composable
 fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
@@ -75,12 +77,7 @@ fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
                 viewModel.setPreviewView(previewView)
                 previewView
             }, modifier = Modifier.fillMaxSize())
-            landmarks.value?.let {
-                if (it.worldLandmarks().isNotEmpty()) {
-                    DrawLandmarks(landmarks = it.landmarks()[0])
-                }
-            }
+            DrawLandmarks(landmarks)
         }
     }
 }
-

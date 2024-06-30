@@ -7,6 +7,9 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -19,6 +22,9 @@ import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executors
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CameraViewModel : ViewModel() {
     private var previewViewRef: WeakReference<PreviewView>? = null
@@ -66,26 +72,27 @@ class CameraViewModel : ViewModel() {
     }
 
     private fun processImageProxy(imageProxy: ImageProxy, context: Context) {
-        val bitmapImage = imageProxy.toBitmap()
+        viewModelScope.launch(Dispatchers.Default) {
+            val bitmapImage = imageProxy.toBitmap()
 
-        if (poseLandmarker == null) {
-            val baseOptions = BaseOptions.builder()
-                .setDelegate(Delegate.CPU)
-                .setModelAssetPath("pose_landmarker_lite.task")
-                .build()
+            if (poseLandmarker == null) {
+                val baseOptions = BaseOptions.builder()
+                    .setDelegate(Delegate.CPU)
+                    .setModelAssetPath("pose_landmarker_lite.task")
+                    .build()
 
-            val options = PoseLandmarker.PoseLandmarkerOptions.builder()
-                .setBaseOptions(baseOptions)
-                .build()
-            poseLandmarker = PoseLandmarker.createFromOptions(context, options)
+                val options = PoseLandmarker.PoseLandmarkerOptions.builder()
+                    .setBaseOptions(baseOptions)
+                    .build()
+                poseLandmarker = PoseLandmarker.createFromOptions(context, options)
+            }
+
+            val mpImage = BitmapImageBuilder(bitmapImage).build()
+            val result = poseLandmarker?.detect(mpImage)
+            result?.let {
+                _landmarks.postValue(it)
+            }
+            imageProxy.close()
         }
-
-        val mpImage = BitmapImageBuilder(bitmapImage).build()
-        val result = poseLandmarker?.detect(mpImage)
-        println(result?.landmarks())
-        result?.let {
-            _landmarks.postValue(it)
-        }
-        imageProxy.close()
     }
 }
