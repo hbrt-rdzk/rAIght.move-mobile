@@ -36,6 +36,7 @@ fun GoogleButtonContent() {
         Text("Continue with google")
     }
 }
+
 @Composable
 fun PickExercise(analysisViewModel: ExerciseAnalysisViewModel) {
     Column(
@@ -60,6 +61,19 @@ fun PickExercise(analysisViewModel: ExerciseAnalysisViewModel) {
             analysisViewModel.setState("video_analysis")
         }) {
             Text(text = "Plank")
+        }
+    }
+}
+
+@Composable
+fun FinishAnalysis(analysisViewModel: ExerciseAnalysisViewModel) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Button(onClick = { analysisViewModel.setState("review") }) {
+            Text(text = "Stop and get review")
         }
     }
 }

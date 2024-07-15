@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.raightmove.raightmove"
-        minSdk = 28
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -82,7 +83,12 @@ dependencies {
 
     implementation(libs.okhttp)
     implementation(libs.gson)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play)
 }

@@ -22,6 +22,11 @@ okhttp = "4.9.1"
 gson = "2.8.8"
 firebaseAuthKtx = "23.0.0"
 runtimeLivedata = "1.6.8"
+moshi = "1.14.0"
+moshiKotlin = "1.14.0"
+googleid = "1.1.0"
+credentials = "1.2.2"
+credentialsPlay =  "1.2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +61,12 @@ okhttp = {group = "com.squareup.okhttp3", name= "okhttp", version.ref = "okhttp"
 gson = {group = "com.google.code.gson", name = "gson", version.ref = "gson"}
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+moshi = {group = "com.squareup.moshi", name = "moshi", version.ref = "moshi"}
+moshi-kotlin = {group = "com.squareup.moshi", name ="moshi-kotlin", version.ref = "moshiKotlin"}
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
+androidx-credentials-play = {group = "androidx.credentials", name = "credentials-play-services-auth", version.ref  = "credentialsPlay"}
+androidx-credentials = {group = "androidx.credentials", name = "credentials", version.ref = "credentials"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

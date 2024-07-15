@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raightmove.raightmove.ui.components.ExercisePreview
+import com.raightmove.raightmove.ui.components.FinishAnalysis
 import com.raightmove.raightmove.ui.components.GetReview
 import com.raightmove.raightmove.ui.components.PickExercise
 import com.raightmove.raightmove.ui.components.SelectExercisePrompt
@@ -28,7 +29,6 @@ fun CameraScreen(
     cameraViewModel: CameraViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val exercise = analysisViewModel.exercise.collectAsState()
     val state = analysisViewModel.analysisState.collectAsState()
 
     val cameraPermissionResult = rememberLauncherForActivityResult(
@@ -58,14 +58,18 @@ fun CameraScreen(
             when (state.value) {
                 "pick_exercise" -> SelectExercisePrompt()
                 "video_analysis" -> ExercisePreview(cameraViewModel, analysisViewModel)
+                "review" -> {
+                    cameraViewModel.stopCamera()
+                    GetReview(analysisViewModel)
+                }
             }
         }
         Box(modifier = Modifier.weight(1f)) {
-            if (exercise.value == null) {
-                PickExercise(analysisViewModel)
-            } else {
-                GetReview(analysisViewModel)
-                cameraViewModel.stopCamera()
+            when (state.value) {
+                "pick_exercise" -> PickExercise(analysisViewModel)
+                "video_analysis" -> {
+                    FinishAnalysis(analysisViewModel)
+                }
             }
         }
     }

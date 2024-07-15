@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class ExerciseAnalysisViewModel : ViewModel() {
     private var poseLandmarker: PoseLandmarker? = null
     private val _exercise = MutableStateFlow<String?>(null)
-    private val _analysisState = MutableStateFlow<String>("pick_exercise")
+    private val _analysisState = MutableStateFlow("pick_exercise")
     private val _landmarks = MutableLiveData<PoseLandmarkerResult>()
     val currentLandmarks: LiveData<PoseLandmarkerResult> get() = _landmarks
     val videoLandmarks = mutableListOf<PoseLandmarkerResult>()
