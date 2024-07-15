@@ -16,12 +16,12 @@ fun GoogleLoginScreen(
     val isError = loginUiState.loginError != null
     val context = LocalContext.current
 
-    authenticationViewModel.loginUserByGoogle(context)
     if (isError) {
         navController?.navigate("authentication_screen")
     } else if (loginUiState.isSuccessLogin) {
         navController?.navigate("camera_screen")
     } else {
+        authenticationViewModel.loginUserByGoogle(context)
         CircularProgressIndicator()
     }
 }
