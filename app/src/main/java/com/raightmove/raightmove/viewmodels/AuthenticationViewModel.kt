@@ -10,14 +10,14 @@ import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.raightmove.raightmove.repositories.FirebaseRepository
+import com.raightmove.raightmove.repositories.FirebaseAuthenticationRepository
 import kotlinx.coroutines.launch
 
 
 const val WEB_CLIENT_ID = "870711698871-j35148ohje94kr0ourq2lh15pg6ur9oi.apps.googleusercontent.com"
 
 class AuthenticationViewModel(
-    private val repository: FirebaseRepository = FirebaseRepository()
+    private val repository: FirebaseAuthenticationRepository = FirebaseAuthenticationRepository()
 ) : ViewModel() {
     val currentUser = repository.currentUser
 
