@@ -2,6 +2,9 @@
 
 package com.raightmove.raightmove.ui.screens.authentication
 
+import Destinations.SIGN_IN_BY_EMAIL_ROUTE
+import Destinations.SIGN_IN_BY_GOOGLE_ROUTE
+import Destinations.SIGN_UP_ROUTE
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -71,7 +74,7 @@ fun AuthenticationScreen(
                         disabledContainerColor = Color.Gray
                     ),
                     onClick = {
-                        navController?.navigate("google_login_screen")
+                        navController?.navigate(SIGN_IN_BY_GOOGLE_ROUTE)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -81,25 +84,25 @@ fun AuthenticationScreen(
                 }
                 Button(
                     onClick = {
-                        navController?.navigate("email_login_screen")
+                        navController?.navigate(SIGN_IN_BY_EMAIL_ROUTE)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 18.dp),
                     colors = ButtonDefaults.buttonColors(Color.DarkGray)
                 ) {
-                    Text("Login with email and password")
+                    Text("Sign in")
                 }
                 Button(
                     onClick = {
-                        navController?.navigate("register_screen")
+                        navController?.navigate(SIGN_UP_ROUTE)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 18.dp),
                     colors = ButtonDefaults.buttonColors(Color.DarkGray)
                 ) {
-                    Text("Register account")
+                    Text("Sign up")
                 }
             }
         }

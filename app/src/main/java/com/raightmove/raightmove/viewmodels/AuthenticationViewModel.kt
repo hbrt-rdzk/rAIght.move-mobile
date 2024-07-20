@@ -23,6 +23,8 @@ class AuthenticationViewModel(
 
     val hasUser get() = repository.hasUser()
 
+    val getUserId get() = repository.getUserID()
+
     var loginUIState by mutableStateOf(LoginUiState())
         private set
 

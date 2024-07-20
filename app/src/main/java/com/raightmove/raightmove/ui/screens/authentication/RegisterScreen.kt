@@ -1,5 +1,6 @@
 package com.raightmove.raightmove.ui.screens.authentication
 
+import Destinations.USER_CREATION_ROUTE
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -100,10 +101,10 @@ fun RegisterScreen(
                 .fillMaxWidth()
                 .padding(bottom = 18.dp)
         ) {
-            Text("Register user")
+            Text("Sign up")
         }
         if (loginUiState.isSuccessLogin) {
-            navController?.navigate("camera_screen")
+            navController?.navigate(USER_CREATION_ROUTE)
         }
     }
 }

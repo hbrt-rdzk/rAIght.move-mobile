@@ -1,5 +1,7 @@
 package com.raightmove.raightmove.ui.screens.authentication
 
+import Destinations.AUTHENTICATION_ROUTE
+import Destinations.USER_CREATION_ROUTE
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,18 +24,18 @@ fun GoogleLoginScreen(
     val context = LocalContext.current
 
     if (isError) {
-        navController?.navigate("authentication_screen")
+        navController?.navigate(AUTHENTICATION_ROUTE)
     } else if (loginUiState.isSuccessLogin) {
-        navController?.navigate("camera_screen")
+        navController?.navigate(USER_CREATION_ROUTE)
     } else {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            authenticationViewModel.loginUserByGoogle(context)
             CircularProgressIndicator()
         }
-        authenticationViewModel.loginUserByGoogle(context)
     }
 }
 

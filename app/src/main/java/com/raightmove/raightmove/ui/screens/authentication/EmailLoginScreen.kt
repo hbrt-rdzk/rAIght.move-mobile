@@ -1,5 +1,6 @@
 package com.raightmove.raightmove.ui.screens.authentication
 
+import Destinations.HOME_ROUTE
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -91,7 +92,7 @@ fun EmailLoginScreen(
             Text("Log in")
         }
         if (loginUiState.isSuccessLogin) {
-            navController?.navigate("camera_screen")
+            navController?.navigate(HOME_ROUTE)
         }
     }
 }
