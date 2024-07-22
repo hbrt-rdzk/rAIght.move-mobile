@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.raightmove.raightmove.R
 import com.raightmove.raightmove.ui.components.GoogleButtonContent
+import com.raightmove.raightmove.ui.themes.Bronze
+import com.raightmove.raightmove.ui.themes.Cream
 
 @Composable
 fun AuthenticationScreen(
@@ -44,22 +48,25 @@ fun AuthenticationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
-            .padding(24.dp),
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Cream, Bronze), // Adjust colors as needed
+                )
+            )
+        ,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     )
     {
         Icon(
-            painter = painterResource(id = R.mipmap.ic_launcher_monochrome),
+            painter = painterResource(id = R.drawable.barbell_icon),
             contentDescription = "App icon",
-            modifier = Modifier.size(256.dp),
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
             tint = Color.Unspecified
         )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

@@ -26,7 +26,17 @@ class FirebaseFirestoreRepository {
             .addOnFailureListener { e ->
                 Log.w("Firestore", "Error adding/updating user", e)
             }
+    }
 
+    suspend fun checkIfExistsInDB(userId: String, onComplete: (Boolean) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        db.collection(USERS_COLLECTION).document(userId).get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                onComplete.invoke(true)
+            } else {
+                onComplete.invoke(false)
+            }
+        }
     }
 
     suspend fun getUser(userId: String): User? = withContext(Dispatchers.IO) {

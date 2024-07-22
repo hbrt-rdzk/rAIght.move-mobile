@@ -156,7 +156,7 @@ fun UserInfoScreen(
         }
         Button(
             onClick = {
-                val userId = authenticationViewModel.getUserId
+                val userId = authenticationViewModel.userId
                 userInfoViewModel.addUser(context, userId)
             },
             modifier = Modifier

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -17,12 +18,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.raightmove.raightmove.ui.themes.Bronze
+import com.raightmove.raightmove.ui.themes.Cream
 import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
 
 @Composable
@@ -37,7 +41,11 @@ fun EmailLoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Cream, Bronze), // Adjust colors as needed
+                )
+            )
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -50,10 +58,10 @@ fun EmailLoginScreen(
             modifier = Modifier.fillMaxWidth(),
             isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = Color.White,
-                unfocusedLabelColor = Color.White,
-                focusedBorderColor = Color.White,
-                unfocusedBorderColor = Color.White
+                focusedLabelColor = Color.Black,
+                unfocusedLabelColor = Bronze,
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Bronze
             )
         )
         OutlinedTextField(
@@ -65,10 +73,10 @@ fun EmailLoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedLabelColor = Color.White,
-                unfocusedLabelColor = Color.White,
-                focusedBorderColor = Color.White,
-                unfocusedBorderColor = Color.White
+                focusedLabelColor = Color.Black,
+                unfocusedLabelColor = Bronze,
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Bronze
             )
         )
         if (isError) {
@@ -87,7 +95,13 @@ fun EmailLoginScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 18.dp)
+                .padding(bottom = 18.dp),
+            colors = ButtonColors(
+                contentColor = Color.White,
+                containerColor = Bronze,
+                disabledContentColor = Color.Black,
+                disabledContainerColor = Color.Gray
+            )
         ) {
             Text("Log in")
         }

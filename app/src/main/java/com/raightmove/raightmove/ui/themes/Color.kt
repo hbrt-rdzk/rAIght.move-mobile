@@ -1,6 +1,8 @@
 package com.raightmove.raightmove.ui.themes
 
 import androidx.compose.ui.graphics.Color
+val Bronze = Color(0xFF554F4F)
+val Cream = Color(0xFFF5EBE2)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

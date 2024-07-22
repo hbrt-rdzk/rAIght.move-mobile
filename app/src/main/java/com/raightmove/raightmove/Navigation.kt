@@ -54,7 +54,7 @@ fun AppNavigation() {
             EmailLoginScreen(navController, authenticationViewModel)
         }
         composable(SIGN_IN_BY_GOOGLE_ROUTE) {
-            GoogleLoginScreen(navController, authenticationViewModel)
+            GoogleLoginScreen(navController, authenticationViewModel, userInfoViewModel)
         }
         composable(USER_CREATION_ROUTE) {
             UserInfoScreen(navController, userInfoViewModel, authenticationViewModel)
