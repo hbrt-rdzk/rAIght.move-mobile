@@ -12,7 +12,8 @@ import com.raightmove.raightmove.R
 
 val MyCustomFont = FontFamily(
     Font(R.font.helvetica, FontWeight.Normal),
-    Font(R.font.helvetica_bold, FontWeight.Bold)
+    Font(R.font.helvetica_bold, FontWeight.Bold),
+    Font(R.font.helveticaboldoblique, FontWeight.ExtraBold)
 )
 val CustomTypography = Typography(
     displayLarge = TextStyle(

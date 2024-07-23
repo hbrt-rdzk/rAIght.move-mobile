@@ -5,8 +5,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.raightmove.raightmove.models.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 const val USERS_COLLECTION = "users"
 
@@ -28,14 +31,20 @@ class FirebaseFirestoreRepository {
             }
     }
 
-    suspend fun checkIfExistsInDB(userId: String, onComplete: (Boolean) -> Unit
-    ) = withContext(Dispatchers.IO) {
-        db.collection(USERS_COLLECTION).document(userId).get().addOnSuccessListener { document ->
-            if (document.exists()) {
-                onComplete.invoke(true)
-            } else {
-                onComplete.invoke(false)
-            }
+    suspend fun checkIfExistsInDB(userId: String): Boolean = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            db.collection(USERS_COLLECTION).document(userId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        continuation.resume(true)
+                    } else {
+                        continuation.resume(false)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    continuation.resumeWithException(exception)
+                }
         }
     }
 

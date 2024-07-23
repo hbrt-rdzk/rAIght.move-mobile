@@ -1,6 +1,6 @@
 package com.raightmove.raightmove.models
 
-data class Joint (
+data class Joint(
     val frame: Int,
     val id: Int,
     val x: Float,

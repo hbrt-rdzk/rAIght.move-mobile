@@ -41,7 +41,7 @@ fun AppNavigation() {
     val authenticationViewModel = AuthenticationViewModel()
     val userInfoViewModel = UserInfoViewModel()
     val startDestination =
-        if (authenticationViewModel.hasUser) "authentication" else "authentication"
+        if (authenticationViewModel.hasUser) HOME_ROUTE else AUTHENTICATION_ROUTE
 
     NavHost(navController, startDestination = startDestination) {
         composable(AUTHENTICATION_ROUTE) {

@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raightmove.raightmove.models.User
 import com.raightmove.raightmove.repositories.FirebaseFirestoreRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserInfoViewModel(
@@ -18,13 +16,6 @@ class UserInfoViewModel(
 ) : ViewModel() {
     var userInfoUiState by mutableStateOf(UserInfoUiState())
         private set
-
-    private var _isUserInDb = MutableStateFlow<Boolean?>(null)
-    var isUserInDb: StateFlow<Boolean?> = _isUserInDb
-
-    private fun setUserInDb(decision: Boolean) {
-        _isUserInDb.value = decision
-    }
 
     fun onNickChange(nick: String) {
         userInfoUiState = userInfoUiState.copy(nick = nick)
@@ -42,9 +33,13 @@ class UserInfoViewModel(
         userInfoUiState = userInfoUiState.copy(height = height)
     }
 
-    fun userExistsInDB(userID: String) = viewModelScope.launch {
-        repository.checkIfExistsInDB(userID) {
-            setUserInDb(it)
+    suspend fun userExistsInDB(userID: String): Boolean {
+        try {
+            val isExist = repository.checkIfExistsInDB(userID)
+            return isExist
+        } catch (e: Exception) {
+            userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
+            return false
         }
     }
 
@@ -59,7 +54,7 @@ class UserInfoViewModel(
             Toast.makeText(context, "Successfully added user", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
-            userInfoUiState = userInfoUiState.copy(isSuccessfullyAdded = true)
+            userInfoUiState = userInfoUiState.copy(isSuccessfullyAdded = false)
             e.printStackTrace()
         } finally {
             userInfoUiState = userInfoUiState.copy(isLoading = false)

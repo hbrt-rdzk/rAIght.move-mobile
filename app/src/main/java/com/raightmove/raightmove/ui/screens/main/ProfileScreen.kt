@@ -20,7 +20,7 @@ fun ProfileScreen(navController: NavController, authenticationViewModel: Authent
 
 
     Scaffold(
-    bottomBar = { BottomMainNavBar(PROFILE_ROUTE, navController) }
+        bottomBar = { BottomMainNavBar(PROFILE_ROUTE, navController) }
     ) { padding ->
         Column(
             modifier = Modifier

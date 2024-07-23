@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -22,6 +24,7 @@ import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
 import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
 import com.raightmove.raightmove.viewmodels.UserInfoViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun GoogleLoginScreen(
@@ -30,43 +33,56 @@ fun GoogleLoginScreen(
     userInfoViewModel: UserInfoViewModel
 ) {
     val loginUiState = authenticationViewModel.loginUIState
-    val userInDb by userInfoViewModel.isUserInDb.collectAsState()
+    val userInfoUiState = userInfoViewModel.userInfoUiState
 
-    val isError = loginUiState.loginError != null
+    val isLoginError = loginUiState.loginError != null
+    val isUserCreationError = userInfoUiState.error != null
+
+    val isSuccessLogin = loginUiState.isSuccessLogin
     val context = LocalContext.current
+
+    var userInDb by remember { mutableStateOf<Boolean?>(null) }
 
     LaunchedEffect(Unit) {
         authenticationViewModel.loginUserByGoogle(context)
     }
 
-    LaunchedEffect(key1 = loginUiState.isSuccessLogin) {
-        if (loginUiState.isSuccessLogin) {
-            userInfoViewModel.userExistsInDB(authenticationViewModel.userId)
+    LaunchedEffect(key1 = isSuccessLogin) {
+        if (isSuccessLogin) {
+            launch {
+                val userId = authenticationViewModel.userId
+                userInDb = userInfoViewModel.userExistsInDB(userId)
+            }
         }
     }
 
-    if (isError) {
-        Toast.makeText(context, "Error occurred", Toast.LENGTH_LONG).show()
-        navController?.navigate(AUTHENTICATION_ROUTE)
-    } else if (loginUiState.isSuccessLogin) {
-        if (userInDb == true) {
-            navController?.navigate(HOME_ROUTE)
-        } else {
-            navController?.navigate(USER_CREATION_ROUTE)
+    when {
+        isLoginError || isUserCreationError -> {
+            Toast.makeText(context, "Error occurred", Toast.LENGTH_LONG).show()
+            navController?.navigate(AUTHENTICATION_ROUTE)
         }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Cream, Bronze),
-                    )
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator()
+
+        loginUiState.isSuccessLogin && (userInDb != null) -> {
+            when (userInDb) {
+                true -> navController?.navigate(HOME_ROUTE)
+                else -> navController?.navigate(USER_CREATION_ROUTE)
+            }
+        }
+
+        else -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Cream, Bronze),
+                        )
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }

@@ -63,9 +63,11 @@ fun CameraScreen(
         Column(
             modifier = Modifier.fillMaxHeight()
         ) {
-            Box(modifier = Modifier
-                .weight(1f)
-                .padding(padding)) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(padding)
+            ) {
                 when (state.value) {
                     "pick_exercise" -> SelectExercisePrompt()
                     "video_analysis" -> ExercisePreview(cameraViewModel, analysisViewModel)
@@ -75,9 +77,11 @@ fun CameraScreen(
                     }
                 }
             }
-            Box(modifier = Modifier
-                .weight(1f)
-                .padding(padding)) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(padding)
+            ) {
                 when (state.value) {
                     "pick_exercise" -> PickExercise(analysisViewModel)
                     "video_analysis" -> {
