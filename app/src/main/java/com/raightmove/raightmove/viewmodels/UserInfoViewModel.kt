@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.raightmove.raightmove.models.Training
 import com.raightmove.raightmove.models.User
 import com.raightmove.raightmove.repositories.FirebaseFirestoreRepository
 import kotlinx.coroutines.launch
@@ -43,6 +44,11 @@ class UserInfoViewModel(
         }
     }
 
+    suspend fun getTrainings(userID: String): List<Training> {
+        val trainingIDs = repository.getTrainingIds(userID)
+        return repository.getTrainings(trainingIDs)
+    }
+
     fun addUser(context: Context, userID: String) = viewModelScope.launch {
         try {
             userInfoUiState = userInfoUiState.copy(isLoading = true)
@@ -55,6 +61,23 @@ class UserInfoViewModel(
         } catch (e: Exception) {
             userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
             userInfoUiState = userInfoUiState.copy(isSuccessfullyAdded = false)
+            e.printStackTrace()
+        } finally {
+            userInfoUiState = userInfoUiState.copy(isLoading = false)
+        }
+    }
+
+    fun addTraining(context: Context, userID: String, training: Training) = viewModelScope.launch {
+        try {
+            userInfoUiState = userInfoUiState.copy(isLoading = true)
+
+            userInfoUiState = userInfoUiState.copy(error = null)
+
+            val trainingID = repository.addTrainingToDb(training)
+            repository.updateUserTrainings(userID, trainingID)
+            Toast.makeText(context, "Successfully added training", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
             e.printStackTrace()
         } finally {
             userInfoUiState = userInfoUiState.copy(isLoading = false)

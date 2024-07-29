@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
 import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
@@ -81,7 +81,7 @@ fun GoogleLoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                CircularProgressIndicator()
+                ProgressIndicator()
             }
         }
     }

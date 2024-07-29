@@ -20,11 +20,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.raightmove.raightmove.ui.components.BottomMainNavBar
-import com.raightmove.raightmove.ui.components.ExercisePreview
-import com.raightmove.raightmove.ui.components.FinishAnalysis
-import com.raightmove.raightmove.ui.components.GetReview
-import com.raightmove.raightmove.ui.components.PickExercise
-import com.raightmove.raightmove.ui.components.SelectExercisePrompt
+import com.raightmove.raightmove.ui.components.analysis.ExercisePreview
+import com.raightmove.raightmove.ui.components.analysis.GetReview
+import com.raightmove.raightmove.ui.components.analysis.PickExercise
+import com.raightmove.raightmove.ui.components.analysis.SelectExercisePrompt
+import com.raightmove.raightmove.ui.components.analysis.SendLandmarksForReviewButton
+import com.raightmove.raightmove.ui.components.analysis.ShowReview
 import com.raightmove.raightmove.viewmodels.CameraViewModel
 import com.raightmove.raightmove.viewmodels.ExerciseAnalysisViewModel
 
@@ -37,23 +38,22 @@ fun CameraScreen(
     val context = LocalContext.current
     val state = analysisViewModel.analysisState.collectAsState()
 
-    val cameraPermissionResult = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { granted ->
-            if (granted) {
-                cameraViewModel.startCamera(context, analysisViewModel)
-            } else {
-                Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    )
+    val cameraPermissionResult =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(),
+            onResult = { granted ->
+                if (granted) {
+                    cameraViewModel.startCamera(context, analysisViewModel)
+                } else {
+                    Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+                }
+            })
 
-    Scaffold(
-        bottomBar = { BottomMainNavBar(CAMERA_ROUTE, navController) }
-    ) { padding ->
+    Scaffold(bottomBar = { BottomMainNavBar(CAMERA_ROUTE, navController) }) { padding ->
         SideEffect {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
                 cameraViewModel.startCamera(context, analysisViewModel)
             } else {
@@ -71,9 +71,13 @@ fun CameraScreen(
                 when (state.value) {
                     "pick_exercise" -> SelectExercisePrompt()
                     "video_analysis" -> ExercisePreview(cameraViewModel, analysisViewModel)
-                    "review" -> {
+                    "send_for_review" -> {
                         cameraViewModel.stopCamera()
                         GetReview(analysisViewModel)
+                    }
+
+                    "review" -> {
+                        ShowReview(analysisViewModel)
                     }
                 }
             }
@@ -85,8 +89,10 @@ fun CameraScreen(
                 when (state.value) {
                     "pick_exercise" -> PickExercise(analysisViewModel)
                     "video_analysis" -> {
-                        FinishAnalysis(analysisViewModel)
+                        SendLandmarksForReviewButton(analysisViewModel)
                     }
+
+                    "review" -> {}
                 }
             }
         }

@@ -11,20 +11,32 @@ import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import com.raightmove.raightmove.models.AnalysisRequestBody
+import com.raightmove.raightmove.models.Feedback
+import com.raightmove.raightmove.models.Joint
+import com.raightmove.raightmove.repositories.ExplainerRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ExerciseAnalysisViewModel : ViewModel() {
+class ExerciseAnalysisViewModel(
+    private val repository: ExplainerRepository = ExplainerRepository()
+) : ViewModel() {
     private var poseLandmarker: PoseLandmarker? = null
+
     private val _exercise = MutableStateFlow<String?>(null)
     private val _analysisState = MutableStateFlow("pick_exercise")
-    private val _landmarks = MutableLiveData<PoseLandmarkerResult>()
-    val currentLandmarks: LiveData<PoseLandmarkerResult> get() = _landmarks
-    val videoLandmarks = mutableListOf<PoseLandmarkerResult>()
-    var analysisState: StateFlow<String> = _analysisState
+    private val _landmarks = MutableLiveData<PoseLandmarkerResult?>(null)
+    private val _joints = MutableStateFlow<List<Joint>?>(mutableListOf())
+    private val _feedback = MutableStateFlow<List<Feedback>?>(mutableListOf())
+
     var exercise: StateFlow<String?> = _exercise
+    var analysisState: StateFlow<String> = _analysisState
+    var videoLandmarks = mutableListOf<PoseLandmarkerResult>()
+    val currentLandmarks: LiveData<PoseLandmarkerResult?> = _landmarks
+    val joints: StateFlow<List<Joint>?> = _joints
+    val feedback: StateFlow<List<Feedback>?> = _feedback
 
     fun setExercise(exercise: String) {
         _exercise.value = exercise
@@ -32,6 +44,19 @@ class ExerciseAnalysisViewModel : ViewModel() {
 
     fun setState(state: String) {
         _analysisState.value = state
+    }
+
+    fun setJoints(joints: List<Joint>) {
+        _joints.value = joints
+    }
+
+    fun setFeedback(response: String) {
+        val feedback = repository.convertResponseToFeedback(response)
+        _feedback.value = feedback
+    }
+
+    suspend fun fetchFeedback(analysisData: AnalysisRequestBody): String {
+        return repository.fetchFeedback(analysisData)
     }
 
     fun processImageProxy(imageProxy: ImageProxy, context: Context) {

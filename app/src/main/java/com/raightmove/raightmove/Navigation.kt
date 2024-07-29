@@ -21,6 +21,8 @@ import com.raightmove.raightmove.ui.screens.main.CameraScreen
 import com.raightmove.raightmove.ui.screens.main.HomeScreen
 import com.raightmove.raightmove.ui.screens.main.ProfileScreen
 import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
+import com.raightmove.raightmove.viewmodels.CameraViewModel
+import com.raightmove.raightmove.viewmodels.ExerciseAnalysisViewModel
 import com.raightmove.raightmove.viewmodels.UserInfoViewModel
 
 object Destinations {
@@ -40,8 +42,10 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val authenticationViewModel = AuthenticationViewModel()
     val userInfoViewModel = UserInfoViewModel()
+    val analysisViewModel = ExerciseAnalysisViewModel()
+    val cameraViewModel = CameraViewModel()
     val startDestination =
-        if (authenticationViewModel.hasUser) HOME_ROUTE else AUTHENTICATION_ROUTE
+        if (authenticationViewModel.hasUser) AUTHENTICATION_ROUTE else AUTHENTICATION_ROUTE
 
     NavHost(navController, startDestination = startDestination) {
         composable(AUTHENTICATION_ROUTE) {
@@ -61,7 +65,7 @@ fun AppNavigation() {
         }
 
         composable(CAMERA_ROUTE) {
-            CameraScreen(navController)
+            CameraScreen(navController, analysisViewModel, cameraViewModel)
         }
         composable(HOME_ROUTE) {
             HomeScreen(navController)

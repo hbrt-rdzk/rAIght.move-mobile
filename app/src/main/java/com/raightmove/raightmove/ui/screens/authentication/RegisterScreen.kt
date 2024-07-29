@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.raightmove.raightmove.R
+import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
 import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
@@ -112,7 +112,7 @@ fun RegisterScreen(
                 )
             }
             if (loginUiState.isLoading) {
-                CircularProgressIndicator()
+                ProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.raightmove.raightmove.R
 import com.raightmove.raightmove.ui.components.GoogleButtonContent
+import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
 import com.raightmove.raightmove.ui.themes.DarkBronze
@@ -91,7 +91,7 @@ fun AuthenticationScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
             if (loading) {
-                CircularProgressIndicator()
+                ProgressIndicator()
             } else {
                 Button(
                     colors = ButtonDefaults.buttonColors(
