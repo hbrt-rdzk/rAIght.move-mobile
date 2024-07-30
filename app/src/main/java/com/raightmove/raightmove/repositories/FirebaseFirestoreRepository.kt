@@ -67,25 +67,16 @@ class FirebaseFirestoreRepository {
             }
         }
 
-    suspend fun checkIfExistsInDB(userId: String): Boolean = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine { continuation ->
-            db.collection(USERS_COLLECTION).document(userId).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        continuation.resume(true)
-                    } else {
-                        continuation.resume(false)
-                    }
-                }.addOnFailureListener { exception ->
-                    continuation.resumeWithException(exception)
-                }
-        }
-    }
-
     suspend fun getUserInfo(userId: String): User? = withContext(Dispatchers.IO) {
-        return@withContext try {
+        try {
             val documentSnapshot = db.collection(USERS_COLLECTION).document(userId).get().await()
-            documentSnapshot.toObject<User>()
+            if (documentSnapshot.exists()) {
+                Log.d("Firestore", "Document data: ${documentSnapshot.data}")
+                documentSnapshot.toObject<User>()
+            } else {
+                Log.w("Firestore", "Document does not exist")
+                null
+            }
         } catch (e: Exception) {
             Log.w("Firestore", "Error getting user", e)
             null

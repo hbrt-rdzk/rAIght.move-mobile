@@ -16,6 +16,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,8 +39,15 @@ fun RegisterScreen(
     navController: NavController? = null,
     authenticationViewModel: AuthenticationViewModel = viewModel()
 ) {
+    LaunchedEffect(Unit) {
+        authenticationViewModel.resetState()
+    }
+
+    val error = authenticationViewModel.error.collectAsState()
+    val isLoading = authenticationViewModel.isLoading.collectAsState()
+    val isSuccessLogin = authenticationViewModel.isSuccessLogin.collectAsState()
+
     val loginUiState = authenticationViewModel.loginUIState
-    val isError = loginUiState.signUpError != null
     val context = LocalContext.current
 
     Column(
@@ -73,7 +82,7 @@ fun RegisterScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = isError
+                isError = error.value != null
             )
             OutlinedTextField(
                 value = loginUiState.passwordSignUp,
@@ -88,7 +97,7 @@ fun RegisterScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = isError
+                isError = error.value != null
             )
             OutlinedTextField(
                 value = loginUiState.confirmPasswordSignUp,
@@ -103,15 +112,15 @@ fun RegisterScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = isError
+                isError = error.value != null
             )
-            if (isError) {
+            if (error.value != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = loginUiState.signUpError.toString(), color = Color.Red
+                    text = error.value.toString(), color = Color.Red
                 )
             }
-            if (loginUiState.isLoading) {
+            if (isLoading.value) {
                 ProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -131,7 +140,7 @@ fun RegisterScreen(
             ) {
                 Text("Continue")
             }
-            if (loginUiState.isSuccessLogin) {
+            if (isSuccessLogin.value) {
                 navController?.navigate(USER_CREATION_ROUTE)
             }
         }

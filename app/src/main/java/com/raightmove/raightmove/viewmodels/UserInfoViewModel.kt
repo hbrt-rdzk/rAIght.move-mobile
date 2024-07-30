@@ -10,11 +10,23 @@ import androidx.lifecycle.viewModelScope
 import com.raightmove.raightmove.models.Training
 import com.raightmove.raightmove.models.User
 import com.raightmove.raightmove.repositories.FirebaseFirestoreRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserInfoViewModel(
     private val repository: FirebaseFirestoreRepository = FirebaseFirestoreRepository()
 ) : ViewModel() {
+    private val _isLoading = MutableStateFlow(false)
+    private val _error = MutableStateFlow<String?>(null)
+    private val _userInfo = MutableStateFlow<User?>(null)
+    private val _userTrainings = MutableStateFlow<List<Training>?>(null)
+
+    val isLoading: StateFlow<Boolean> = _isLoading
+    val error: StateFlow<String?> = _error
+    val userInfo: StateFlow<User?> = _userInfo
+    val userTrainings: StateFlow<List<Training>?> = _userTrainings
+
     var userInfoUiState by mutableStateOf(UserInfoUiState())
         private set
 
@@ -34,53 +46,63 @@ class UserInfoViewModel(
         userInfoUiState = userInfoUiState.copy(height = height)
     }
 
-    suspend fun userExistsInDB(userID: String): Boolean {
+    suspend fun fetchUserInfo(userID: String) {
         try {
-            val isExist = repository.checkIfExistsInDB(userID)
-            return isExist
+            _isLoading.value = true
+            _error.value = null
+            _userInfo.value = repository.getUserInfo(userID)
         } catch (e: Exception) {
-            userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
-            return false
+            _error.value = e.localizedMessage
+        } finally {
+            _isLoading.value = false
         }
     }
 
-    suspend fun getTrainings(userID: String): List<Training> {
-        val trainingIDs = repository.getTrainingIds(userID)
-        return repository.getTrainings(trainingIDs)
+    suspend fun fetchTrainings(userID: String) {
+        try {
+            _isLoading.value = true
+            _error.value = null
+
+            val trainingIDs = repository.getTrainingIds(userID)
+            val trainings = repository.getTrainings(trainingIDs)
+            _userTrainings.value = trainings
+        } catch (e: Exception) {
+            _error.value = e.localizedMessage
+        } finally {
+            _isLoading.value = false
+        }
     }
 
-    fun addUser(context: Context, userID: String) = viewModelScope.launch {
+    fun addUserInfo(context: Context, userID: String) = viewModelScope.launch {
         try {
-            userInfoUiState = userInfoUiState.copy(isLoading = true)
-            userInfoUiState = userInfoUiState.copy(error = null)
+            _isLoading.value = true
+            _error.value = null
 
             val user = userInfoUiState.getUser()
             repository.addUserToDb(userID, user)
-            userInfoUiState = userInfoUiState.copy(isSuccessfullyAdded = true)
             Toast.makeText(context, "Successfully added user", Toast.LENGTH_SHORT).show()
+            _userInfo.value = user
         } catch (e: Exception) {
-            userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
-            userInfoUiState = userInfoUiState.copy(isSuccessfullyAdded = false)
-            e.printStackTrace()
+            _error.value = e.localizedMessage
+            Toast.makeText(context, "Error occurred", Toast.LENGTH_SHORT).show()
         } finally {
-            userInfoUiState = userInfoUiState.copy(isLoading = false)
+            _isLoading.value = false
         }
     }
 
     fun addTraining(context: Context, userID: String, training: Training) = viewModelScope.launch {
         try {
-            userInfoUiState = userInfoUiState.copy(isLoading = true)
-
-            userInfoUiState = userInfoUiState.copy(error = null)
+            _isLoading.value = true
+            _error.value = null
 
             val trainingID = repository.addTrainingToDb(training)
             repository.updateUserTrainings(userID, trainingID)
             Toast.makeText(context, "Successfully added training", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            userInfoUiState = userInfoUiState.copy(error = e.localizedMessage)
-            e.printStackTrace()
+            _error.value = e.localizedMessage
+            Toast.makeText(context, "Error occurred", Toast.LENGTH_SHORT).show()
         } finally {
-            userInfoUiState = userInfoUiState.copy(isLoading = false)
+            _isLoading.value = false
         }
     }
 }
@@ -90,9 +112,6 @@ data class UserInfoUiState(
     val age: String? = null,
     val sex: String? = null,
     val height: String? = null,
-    val error: String? = null,
-    val isLoading: Boolean = false,
-    val isSuccessfullyAdded: Boolean = false
 ) {
     private fun validateUserInfo(): Boolean {
         return age != null && sex != null && height != null && nick != null
@@ -104,7 +123,8 @@ data class UserInfoUiState(
                 nick = nick!!,
                 age = age!!.toInt(),
                 gender = sex!!,
-                height = height!!.toInt()
+                height = height!!.toInt(),
+                trainings = mutableListOf()
             )
         } else {
             throw IllegalArgumentException(

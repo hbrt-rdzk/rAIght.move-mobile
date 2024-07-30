@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,40 +33,38 @@ fun GoogleLoginScreen(
     authenticationViewModel: AuthenticationViewModel,
     userInfoViewModel: UserInfoViewModel
 ) {
-    val loginUiState = authenticationViewModel.loginUIState
-    val userInfoUiState = userInfoViewModel.userInfoUiState
-
-    val isLoginError = loginUiState.loginError != null
-    val isUserCreationError = userInfoUiState.error != null
-
-    val isSuccessLogin = loginUiState.isSuccessLogin
+    val isSuccessLogin = authenticationViewModel.isSuccessLogin.collectAsState()
+    val loginError = authenticationViewModel.error.collectAsState()
+    val userCreationError = userInfoViewModel.error.collectAsState()
+    val userInfo = userInfoViewModel.userInfo.collectAsState()
     val context = LocalContext.current
 
-    var userInDb by remember { mutableStateOf<Boolean?>(null) }
+    var checkedUser by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         authenticationViewModel.loginUserByGoogle(context)
     }
 
-    LaunchedEffect(key1 = isSuccessLogin) {
-        if (isSuccessLogin) {
+    LaunchedEffect(key1 = isSuccessLogin.value) {
+        if (isSuccessLogin.value) {
             launch {
                 val userId = authenticationViewModel.userId
-                userInDb = userInfoViewModel.userExistsInDB(userId)
+                userInfoViewModel.fetchUserInfo(userId)
+                checkedUser = true
             }
         }
     }
 
     when {
-        isLoginError || isUserCreationError -> {
+        loginError.value != null || userCreationError.value != null -> {
             Toast.makeText(context, "Error occurred", Toast.LENGTH_LONG).show()
             navController?.navigate(AUTHENTICATION_ROUTE)
         }
 
-        loginUiState.isSuccessLogin && (userInDb != null) -> {
-            when (userInDb) {
-                true -> navController?.navigate(HOME_ROUTE)
-                else -> navController?.navigate(USER_CREATION_ROUTE)
+        isSuccessLogin.value && checkedUser -> {
+            when (userInfo.value) {
+                null -> navController?.navigate(USER_CREATION_ROUTE)
+                else -> navController?.navigate(HOME_ROUTE)
             }
         }
 

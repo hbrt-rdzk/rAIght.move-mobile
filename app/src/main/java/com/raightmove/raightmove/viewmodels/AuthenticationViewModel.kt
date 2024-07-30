@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.raightmove.raightmove.repositories.FirebaseAuthenticationRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
@@ -19,6 +21,14 @@ const val WEB_CLIENT_ID = "870711698871-j35148ohje94kr0ourq2lh15pg6ur9oi.apps.go
 class AuthenticationViewModel(
     private val repository: FirebaseAuthenticationRepository = FirebaseAuthenticationRepository()
 ) : ViewModel() {
+    private val _isLoading = MutableStateFlow(false)
+    private val _isSuccessLogin = MutableStateFlow(false)
+    private val _error = MutableStateFlow<String?>(null)
+
+    val isLoading: StateFlow<Boolean> = _isLoading
+    val isSuccessLogin: StateFlow<Boolean> = _isSuccessLogin
+    val error: StateFlow<String?> = _error
+
     val currentUser = repository.currentUser
 
     val hasUser get() = repository.hasUser()
@@ -27,6 +37,13 @@ class AuthenticationViewModel(
 
     var loginUIState by mutableStateOf(LoginUiState())
         private set
+
+    fun resetState() {
+        loginUIState = LoginUiState()
+        _error.value = null
+        _isSuccessLogin.value = false
+        _isLoading.value = false
+    }
 
     fun onUserNameChange(userName: String) {
         loginUIState = loginUIState.copy(userName = userName)
@@ -57,66 +74,67 @@ class AuthenticationViewModel(
     private fun checkIfSuccessfulLogin(isSuccessLogin: Boolean, context: Context) {
         if (isSuccessLogin) {
             Toast.makeText(context, "Success logging", Toast.LENGTH_SHORT).show()
-            loginUIState = loginUIState.copy(isSuccessLogin = true)
+            _isSuccessLogin.value = true
         } else {
             Toast.makeText(context, "Failed logging", Toast.LENGTH_SHORT).show()
-            loginUIState = loginUIState.copy(isSuccessLogin = false)
+            _isSuccessLogin.value = false
         }
     }
 
     fun createUser(context: Context) = viewModelScope.launch {
         try {
+            _error.value = null
+            _isLoading.value = true
+
             if (validateSignUpForm()) {
                 throw IllegalArgumentException("email and password can not be empty")
             }
-            loginUIState = loginUIState.copy(isLoading = true)
             if (loginUIState.passwordSignUp != loginUIState.confirmPasswordSignUp) {
                 throw IllegalArgumentException(
                     "Passwords do not match"
                 )
             }
-            loginUIState = loginUIState.copy(signUpError = null)
             repository.createUser(
-                loginUIState.userNameSignUp,
-                loginUIState.passwordSignUp
+                loginUIState.userNameSignUp, loginUIState.passwordSignUp
             ) { isSuccessfulLogin ->
                 checkIfSuccessfulLogin(isSuccessfulLogin, context)
             }
+            _isSuccessLogin.value = true
         } catch (e: Exception) {
-            loginUIState = loginUIState.copy(signUpError = e.localizedMessage)
-            e.printStackTrace()
+            _isSuccessLogin.value = false
+            _error.value = e.localizedMessage
         } finally {
-            loginUIState = loginUIState.copy(isLoading = false)
+            _isLoading.value = false
         }
     }
 
     fun loginUser(context: Context) = viewModelScope.launch {
         try {
+            _error.value = null
+            _isLoading.value = true
+
             if (validateLoginForm()) {
                 throw IllegalArgumentException("email and password can not be empty")
             }
-            loginUIState = loginUIState.copy(isLoading = true)
-            loginUIState = loginUIState.copy(loginError = null)
             repository.login(loginUIState.userName, loginUIState.password) { isSuccessfulLogin ->
                 checkIfSuccessfulLogin(isSuccessfulLogin, context)
             }
+            _isSuccessLogin.value = true
         } catch (e: Exception) {
-            loginUIState = loginUIState.copy(loginError = e.localizedMessage)
-            e.printStackTrace()
+            _isSuccessLogin.value = false
+            _error.value = e.localizedMessage
         } finally {
-            loginUIState = loginUIState.copy(isLoading = false)
+            _isLoading.value = false
         }
     }
 
     fun loginUserByGoogle(context: Context) = viewModelScope.launch {
         try {
+            _error.value = null
+            _isLoading.value = true
+
             val credentialManager = CredentialManager.create(context)
-
-            loginUIState = loginUIState.copy(isLoading = true)
-            loginUIState = loginUIState.copy(loginError = null)
-
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(true)
+            val googleIdOption = GetGoogleIdOption.Builder().setFilterByAuthorizedAccounts(true)
                 .setServerClientId(WEB_CLIENT_ID).build()
 
             val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
@@ -125,11 +143,12 @@ class AuthenticationViewModel(
             repository.loginByGoogle(credentialResult.credential) { isSuccessfulLogin ->
                 checkIfSuccessfulLogin(isSuccessfulLogin, context)
             }
+            _isSuccessLogin.value = true
         } catch (e: Exception) {
-            loginUIState = loginUIState.copy(loginError = e.localizedMessage)
-            e.printStackTrace()
+            _isSuccessLogin.value = false
+            _error.value = e.localizedMessage
         } finally {
-            loginUIState = loginUIState.copy(isLoading = false)
+            _isLoading.value = false
         }
     }
 }
@@ -140,8 +159,4 @@ data class LoginUiState(
     val userNameSignUp: String = "",
     val passwordSignUp: String = "",
     val confirmPasswordSignUp: String = "",
-    val isLoading: Boolean = false,
-    val isSuccessLogin: Boolean = false,
-    val signUpError: String? = null,
-    val loginError: String? = null
 )

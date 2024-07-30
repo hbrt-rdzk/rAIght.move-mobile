@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,11 +53,14 @@ fun UserInfoScreen(
 ) {
     val sexOptions = listOf("Male", "Female")
 
+    val isError = userInfoViewModel.error.collectAsState()
+    val isLoading = userInfoViewModel.isLoading.collectAsState()
+    val userInfo = userInfoViewModel.userInfo.collectAsState()
     val userInfoUiState = userInfoViewModel.userInfoUiState
-    val isError = userInfoUiState.error != null
+
+    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -91,7 +95,7 @@ fun UserInfoScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = isError
+                isError = isError.value != null
             )
             OutlinedTextField(
                 value = userInfoUiState.age.orEmpty(),
@@ -109,7 +113,7 @@ fun UserInfoScreen(
                 ),
 
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isError
+                isError = isError.value != null
             )
             OutlinedTextField(
                 value = userInfoUiState.height.orEmpty(),
@@ -124,7 +128,7 @@ fun UserInfoScreen(
                     unfocusedBorderColor = Bronze
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isError
+                isError = isError.value != null
             )
             OutlinedTextField(
                 value = userInfoUiState.sex.orEmpty(),
@@ -143,7 +147,7 @@ fun UserInfoScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = isError
+                isError = isError.value != null
             )
             DropdownMenu(
                 expanded = expanded, onDismissRequest = {
@@ -164,7 +168,7 @@ fun UserInfoScreen(
             Button(
                 onClick = {
                     val userId = authenticationViewModel.userId
-                    userInfoViewModel.addUser(context, userId)
+                    userInfoViewModel.addUserInfo(context, userId)
                 }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 18.dp), colors = ButtonColors(
@@ -179,16 +183,15 @@ fun UserInfoScreen(
         }
     }
 
-    if (isError) {
+    if (isError.value != null) {
         Text(
-            text = userInfoUiState.error.toString(), color = Color.Red
+            text = isError.value.toString(), color = Color.Red
         )
     }
-    if (userInfoUiState.isLoading) {
+    if (isLoading.value) {
         ProgressIndicator()
     }
-
-    if (userInfoUiState.isSuccessfullyAdded) {
+    if (userInfo.value != null) {
         navController?.navigate(HOME_ROUTE)
     }
 }

@@ -16,6 +16,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,8 +38,14 @@ fun EmailLoginScreen(
     navController: NavController? = null,
     authenticationViewModel: AuthenticationViewModel
 ) {
+    LaunchedEffect(Unit) {
+        authenticationViewModel.resetState()
+    }
+    val loginError = authenticationViewModel.error.collectAsState()
+    val isLoading = authenticationViewModel.isLoading.collectAsState()
+    val isSuccessLogin = authenticationViewModel.isSuccessLogin.collectAsState()
+
     val loginUiState = authenticationViewModel.loginUIState
-    val isError = loginUiState.loginError != null
     val context = LocalContext.current
 
 
@@ -69,7 +77,7 @@ fun EmailLoginScreen(
                 label = { Text("Email") },
                 textStyle = TextStyle(color = Bronze),
                 modifier = Modifier.fillMaxWidth(),
-                isError = isError,
+                isError = loginError.value != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Bronze,
@@ -84,7 +92,7 @@ fun EmailLoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(color = Bronze),
                 visualTransformation = PasswordVisualTransformation(),
-                isError = isError,
+                isError = loginError.value != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Bronze,
@@ -92,13 +100,13 @@ fun EmailLoginScreen(
                     unfocusedBorderColor = Bronze
                 )
             )
-            if (isError) {
+            if (loginError.value != null) {
                 Text(
-                    text = loginUiState.loginError.toString(),
+                    text = loginError.value.toString(),
                     color = Color.Red
                 )
             }
-            if (loginUiState.isLoading) {
+            if (isLoading.value) {
                 ProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -117,7 +125,7 @@ fun EmailLoginScreen(
             ) {
                 Text("Continue")
             }
-            if (loginUiState.isSuccessLogin) {
+            if (isSuccessLogin.value) {
                 navController?.navigate(HOME_ROUTE)
             }
         }
