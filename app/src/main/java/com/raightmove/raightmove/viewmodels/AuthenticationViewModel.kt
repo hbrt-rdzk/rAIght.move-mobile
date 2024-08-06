@@ -151,6 +151,10 @@ class AuthenticationViewModel(
             _isLoading.value = false
         }
     }
+
+    fun logOut() {
+        repository.logOut()
+    }
 }
 
 data class LoginUiState(

@@ -62,7 +62,7 @@ class FirebaseAuthenticationRepository {
                 }.await()
         }
 
-    suspend fun logOut(): Unit = withContext(Dispatchers.IO) {
+    fun logOut() {
         auth.signOut()
     }
 }

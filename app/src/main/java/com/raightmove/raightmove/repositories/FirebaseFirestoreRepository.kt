@@ -8,11 +8,8 @@ import com.google.firebase.firestore.toObject
 import com.raightmove.raightmove.models.Training
 import com.raightmove.raightmove.models.User
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 const val USERS_COLLECTION = "users"
 const val TRAININGS_COLLECTION = "trainings"
@@ -23,79 +20,48 @@ class FirebaseFirestoreRepository {
     suspend fun addUserToDb(
         userId: String,
         user: User,
-    ) = withContext(Dispatchers.IO) {
-        db.collection(USERS_COLLECTION).document(userId).set(user).addOnSuccessListener {
-            Log.d("Firestore", "User added/updated successfully")
-        }.addOnFailureListener { e ->
-            Log.w("Firestore", "Error adding/updating user", e)
-        }
+    ): Void = withContext(Dispatchers.IO) {
+        db.collection(USERS_COLLECTION).document(userId).set(user).await()
     }
 
     suspend fun getTrainingIds(userID: String): List<String> = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine { continuation ->
-            db.collection(USERS_COLLECTION).document(userID).get()
-                .addOnSuccessListener { document ->
-                    val trainings = document.get("trainings")
-                    if (trainings is List<*>) {
-                        val trainingIds = trainings.filterIsInstance<String>()
-                        continuation.resume(trainingIds)
-                    }
-                }.addOnFailureListener { exception ->
-                    continuation.resumeWithException(exception)
-                }
+        val db = FirebaseFirestore.getInstance()
+        val document = db.collection("users").document(userID).get().await()
+        val trainings = document.get("trainings")
+        if (trainings is List<*>) {
+            trainings.filterIsInstance<String>()
+        } else {
+            emptyList()
         }
     }
+
 
     suspend fun getTrainings(trainingIds: List<String>): List<Training> =
         withContext(Dispatchers.IO) {
             val trainings = mutableListOf<Training>()
-
-            suspendCancellableCoroutine { continuation ->
-                trainingIds.forEach { id ->
-                    db.collection(TRAININGS_COLLECTION).document(id).get()
-                        .addOnSuccessListener { document ->
-                            if (document != null && document.exists()) {
-                                val training = document.toObject(Training::class.java)
-                                if (training != null) {
-                                    trainings.add(training)
-                                }
-                            }
-                        }.addOnFailureListener { exception ->
-                            continuation.resumeWithException(exception)
-                        }
+            trainingIds.forEach { id ->
+                val document = db.collection(TRAININGS_COLLECTION).document(id).get().await()
+                val training = document.toObject(Training::class.java)
+                if (training != null) {
+                    trainings.add(training)
                 }
             }
+            trainings
         }
 
     suspend fun getUserInfo(userId: String): User? = withContext(Dispatchers.IO) {
-        try {
-            val documentSnapshot = db.collection(USERS_COLLECTION).document(userId).get().await()
-            if (documentSnapshot.exists()) {
-                Log.d("Firestore", "Document data: ${documentSnapshot.data}")
-                documentSnapshot.toObject<User>()
-            } else {
-                Log.w("Firestore", "Document does not exist")
-                null
-            }
-        } catch (e: Exception) {
-            Log.w("Firestore", "Error getting user", e)
+        val documentSnapshot = db.collection(USERS_COLLECTION).document(userId).get().await()
+        if (documentSnapshot.exists()) {
+            documentSnapshot.toObject<User>()
+        } else {
             null
         }
     }
 
     suspend fun addTrainingToDb(training: Training): String = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine { continuation ->
-            db.collection(TRAININGS_COLLECTION).add(training)
-                .addOnSuccessListener { documentReference ->
-                    val trainingId = documentReference.id
-                    Log.d(TAG, "DocumentSnapshot added with ID: $trainingId")
-                    continuation.resume(trainingId)
-                }.addOnFailureListener { e ->
-                    Log.w(TAG, "Error adding document", e)
-                    continuation.resumeWithException(e)
-                }
-
-        }
+        val document = db.collection(TRAININGS_COLLECTION).add(training).await()
+        val trainingId = document.id
+        trainingId
     }
 
     suspend fun updateUserTrainings(userId: String, trainingId: String) =

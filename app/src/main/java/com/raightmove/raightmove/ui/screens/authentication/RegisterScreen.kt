@@ -16,7 +16,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +38,7 @@ fun RegisterScreen(
     navController: NavController? = null,
     authenticationViewModel: AuthenticationViewModel = viewModel()
 ) {
-    LaunchedEffect(Unit) {
-        authenticationViewModel.resetState()
-    }
+    authenticationViewModel.resetState()
 
     val error = authenticationViewModel.error.collectAsState()
     val isLoading = authenticationViewModel.isLoading.collectAsState()

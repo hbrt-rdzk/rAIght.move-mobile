@@ -45,7 +45,7 @@ fun AppNavigation() {
     val analysisViewModel = ExerciseAnalysisViewModel()
     val cameraViewModel = CameraViewModel()
     val startDestination =
-        if (authenticationViewModel.hasUser) AUTHENTICATION_ROUTE else AUTHENTICATION_ROUTE
+        if (authenticationViewModel.hasUser) HOME_ROUTE else AUTHENTICATION_ROUTE
 
     NavHost(navController, startDestination = startDestination) {
         composable(AUTHENTICATION_ROUTE) {
