@@ -1,11 +1,13 @@
 package com.raightmove.raightmove.ui.screens.main
 
 import Destinations.AUTHENTICATION_ROUTE
-import Destinations.HOME_ROUTE
 import Destinations.PROFILE_ROUTE
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -14,7 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.raightmove.raightmove.ui.components.BottomMainNavBar
 import com.raightmove.raightmove.ui.themes.Bronze
@@ -29,15 +35,33 @@ fun ProfileScreen(navController: NavController, authenticationViewModel: Authent
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            verticalArrangement = Arrangement.Center,
-            Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(elevation = 8.dp)
+                    .background(
+                        color = Color.White
+                    )
+                    .padding(6.dp),
+            ) {
+                Text(
+                    text = "Profile",
+                    modifier = Modifier.padding(24.dp),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    color = Color.Black
+                )
+            }
             Button(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
                 onClick = {
                     authenticationViewModel.logOut()
-                    val startDestination =
-                        if (authenticationViewModel.hasUser) HOME_ROUTE else AUTHENTICATION_ROUTE
-                    navController.navigate(startDestination)
+                    navController.navigate(AUTHENTICATION_ROUTE)
                 }, colors = ButtonColors(
                     contentColor = Cream,
                     containerColor = Bronze,
