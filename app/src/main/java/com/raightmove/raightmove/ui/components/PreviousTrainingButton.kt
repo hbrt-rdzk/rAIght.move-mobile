@@ -3,10 +3,8 @@ package com.raightmove.raightmove.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
@@ -17,16 +15,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.raightmove.raightmove.R
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
+
+val exerciseIcons = mapOf(
+    "squat" to R.drawable.squat,
+    "lunges" to R.drawable.lunges,
+    "plank" to R.drawable.plank
+)
+
 
 @Composable
 fun PreviousTrainingButton(
     exercise: String, date: String, repsNum: Int, onClick: () -> Unit
 ) {
+
     return Button(
-        onClick = { onClick },
+        onClick = { onClick() },
         colors = ButtonColors(
             contentColor = Cream,
             containerColor = Bronze,
@@ -40,9 +47,14 @@ fun PreviousTrainingButton(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Filled.Email,
-                contentDescription = "App icon",
-                tint = Color.Unspecified
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(
+                    id = exerciseIcons.getOrDefault(
+                        exercise,
+                        R.drawable.home_icon
+                    )
+                ),
+                contentDescription = exercise + "icon"
             )
             Text(text = exercise.uppercase())
             Column {

@@ -88,7 +88,11 @@ fun CalendarScreen(
                                     disabledContainerColor = Color.Gray
                                 )
                             ) {
-                                PreviousTrainingButton(training.exercise, training.date, training.feedbacks.size) {}
+                                PreviousTrainingButton(
+                                    training.exercise,
+                                    training.date,
+                                    training.feedbacks.size
+                                ) {}
                             }
                         }
                     }
