@@ -1,6 +1,7 @@
 package com.raightmove.raightmove.ui.screens.authentication
 
 import Destinations.USER_CREATION_ROUTE
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,35 +17,42 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.raightmove.raightmove.R
 import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
-import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
+import com.raightmove.raightmove.ui.themes.DarkBronze
+import com.raightmove.raightmove.viewmodels.LoginUiState
 
 @Composable
 fun RegisterScreen(
     navController: NavController? = null,
-    authenticationViewModel: AuthenticationViewModel = viewModel()
+    loginUIState: LoginUiState,
+    error: String?,
+    isLoading: Boolean,
+    isSuccessLogin: Boolean,
+    onEnter: () -> Unit,
+    createUser: (Context) -> Unit,
+    onUserNameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onPasswordConfirmationChange: (String) -> Unit,
 ) {
-    authenticationViewModel.resetState()
-
-    val error = authenticationViewModel.error.collectAsState()
-    val isLoading = authenticationViewModel.isLoading.collectAsState()
-    val isSuccessLogin = authenticationViewModel.isSuccessLogin.collectAsState()
-
-    val loginUiState = authenticationViewModel.loginUIState
+    LaunchedEffect(Unit) {
+        onEnter()
+    }
     val context = LocalContext.current
 
     Column(
@@ -60,16 +68,26 @@ fun RegisterScreen(
                 .aspectRatio(1f),
             tint = Color.Unspecified
         )
+        Text(
+            text = "Create new account",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Normal,
+            color = DarkBronze,
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             OutlinedTextField(
-                value = loginUiState.userNameSignUp,
-                onValueChange = { authenticationViewModel.onUserNameSignUp(it) },
+                value = loginUIState.userNameSignUp,
+                onValueChange = { onUserNameChange(it) },
                 label = { Text("Email") },
                 textStyle = TextStyle(color = Bronze),
                 modifier = Modifier.fillMaxWidth(),
@@ -79,11 +97,11 @@ fun RegisterScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = error.value != null
+                isError = error != null
             )
             OutlinedTextField(
-                value = loginUiState.passwordSignUp,
-                onValueChange = { authenticationViewModel.onPasswordSignUp(it) },
+                value = loginUIState.passwordSignUp,
+                onValueChange = { onPasswordChange(it) },
                 label = { Text("Password (6+ characters)") },
                 textStyle = TextStyle(color = Bronze),
                 modifier = Modifier.fillMaxWidth(),
@@ -94,11 +112,11 @@ fun RegisterScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = error.value != null
+                isError = error != null
             )
             OutlinedTextField(
-                value = loginUiState.confirmPasswordSignUp,
-                onValueChange = { authenticationViewModel.onConfirmPasswordSignUp(it) },
+                value = loginUIState.confirmPasswordSignUp,
+                onValueChange = { onPasswordConfirmationChange(it) },
                 label = { Text("Confirm password") },
                 textStyle = TextStyle(color = Bronze),
                 modifier = Modifier.fillMaxWidth(),
@@ -109,21 +127,21 @@ fun RegisterScreen(
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = Bronze
                 ),
-                isError = error.value != null
+                isError = error != null
             )
-            if (error.value != null) {
+            if (error != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = error.value.toString(), color = Color.Red
+                    text = error.toString(), color = Color.Red
                 )
             }
-            if (isLoading.value) {
+            if (isLoading) {
                 ProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    authenticationViewModel.createUser(context)
+                    createUser(context)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,7 +155,7 @@ fun RegisterScreen(
             ) {
                 Text("Continue")
             }
-            if (isSuccessLogin.value) {
+            if (isSuccessLogin) {
                 navController?.navigate(USER_CREATION_ROUTE)
             }
         }

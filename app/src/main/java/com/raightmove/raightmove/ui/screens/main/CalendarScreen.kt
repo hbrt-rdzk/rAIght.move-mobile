@@ -11,13 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -25,27 +22,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.raightmove.raightmove.models.Training
 import com.raightmove.raightmove.ui.components.BottomMainNavBar
 import com.raightmove.raightmove.ui.components.PreviousTrainingButton
 import com.raightmove.raightmove.ui.components.ProgressIndicator
-import com.raightmove.raightmove.ui.themes.Bronze
-import com.raightmove.raightmove.ui.themes.Cream
-import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
-import com.raightmove.raightmove.viewmodels.UserInfoViewModel
 
 @Composable
 fun CalendarScreen(
     navController: NavController,
-    userInfoViewModel: UserInfoViewModel = viewModel(),
-    authenticationViewModel: AuthenticationViewModel = viewModel()
+    trainings: List<Training>?,
+    getUserID: () -> String,
+    fetchTraining: suspend (String) -> Unit
 ) {
-    val trainings = userInfoViewModel.userTrainings.collectAsState()
 
     LaunchedEffect(Unit) {
-        val userId = authenticationViewModel.userId
-        userInfoViewModel.fetchTrainings(userId)
+        val userId = getUserID()
+        fetchTraining(userId)
     }
 
     Scaffold(bottomBar = { BottomMainNavBar(CALENDAR_ROUTE, navController) }) { padding ->
@@ -73,27 +66,14 @@ fun CalendarScreen(
             }
 
             when {
-                trainings.value != null -> {
+                trainings != null -> {
                     LazyColumn {
-                        items(trainings.value!!) { training ->
-                            Button(
-                                onClick = {},
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
-                                colors = ButtonColors(
-                                    contentColor = Cream,
-                                    containerColor = Bronze,
-                                    disabledContentColor = Color.Black,
-                                    disabledContainerColor = Color.Gray
-                                )
-                            ) {
-                                PreviousTrainingButton(
-                                    training.exercise,
-                                    training.date,
-                                    training.feedbacks.size
-                                ) {}
-                            }
+                        items(trainings) { training ->
+                            PreviousTrainingButton(
+                                training.exercise,
+                                training.date,
+                                training.feedbacks.size
+                            ) {}
                         }
                     }
                 }

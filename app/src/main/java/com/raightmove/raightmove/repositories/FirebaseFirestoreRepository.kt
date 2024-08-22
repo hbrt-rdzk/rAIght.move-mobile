@@ -15,12 +15,12 @@ const val USERS_COLLECTION = "users"
 const val TRAININGS_COLLECTION = "trainings"
 
 class FirebaseFirestoreRepository {
-    private val db = FirebaseFirestore.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     suspend fun addUserToDb(
         userId: String,
         user: User,
-    ): Void = withContext(Dispatchers.IO) {
+    ) = withContext(Dispatchers.IO) {
         db.collection(USERS_COLLECTION).document(userId).set(user).await()
     }
 

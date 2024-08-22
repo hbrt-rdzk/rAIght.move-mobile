@@ -10,9 +10,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 
-class FirebaseAuthenticationRepository {
-    private val auth = FirebaseAuth.getInstance()
-    val currentUser = auth.currentUser
+open class FirebaseAuthenticationRepository {
+    open val auth = FirebaseAuth.getInstance()
 
     fun hasUser() = auth.currentUser != null
 

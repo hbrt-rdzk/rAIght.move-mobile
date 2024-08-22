@@ -73,18 +73,16 @@ class UserInfoViewModel(
         }
     }
 
-    fun addUserInfo(context: Context, userID: String) = viewModelScope.launch {
+    fun addUserInfo(userID: String) = viewModelScope.launch {
         try {
             _isLoading.value = true
             _error.value = null
 
             val user = userInfoUiState.getUser()
             repository.addUserToDb(userID, user)
-            Toast.makeText(context, "Successfully added user", Toast.LENGTH_SHORT).show()
             _userInfo.value = user
         } catch (e: Exception) {
             _error.value = e.localizedMessage
-            Toast.makeText(context, "Error occurred", Toast.LENGTH_SHORT).show()
         } finally {
             _isLoading.value = false
         }

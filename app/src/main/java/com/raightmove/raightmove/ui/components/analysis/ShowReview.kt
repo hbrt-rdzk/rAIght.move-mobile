@@ -49,7 +49,7 @@ fun ShowReview(
                     joints = analysisViewModel.joints.value!!,
                     date = currentDateTime
                 )
-                val userId = authenticationViewModel.userId
+                val userId = authenticationViewModel.getUserId()
                 userInfoViewModel.addTraining(context, userId, training)
             }, colors = ButtonColors(
                 contentColor = Cream,

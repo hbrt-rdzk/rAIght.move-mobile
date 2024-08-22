@@ -73,7 +73,7 @@ fun AuthenticationScreen(
             textAlign = TextAlign.Center
         )
         Text(
-            text = "Fix your posture and increase progress with the help of AI.",
+            text = "Fix your posture and increase progress with the help of AI",
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             color = DarkBronze,

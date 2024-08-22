@@ -22,14 +22,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.raightmove.raightmove.models.User
 import com.raightmove.raightmove.ui.components.BottomMainNavBar
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
-import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
 
 @Composable
-fun ProfileScreen(navController: NavController, authenticationViewModel: AuthenticationViewModel) {
-
+fun ProfileScreen(
+    navController: NavController? = null, userInfo: User?, logOut: () -> Unit
+) {
     Scaffold(bottomBar = { BottomMainNavBar(PROFILE_ROUTE, navController) }) { padding ->
         Column(
             modifier = Modifier
@@ -55,13 +56,18 @@ fun ProfileScreen(navController: NavController, authenticationViewModel: Authent
                     color = Color.Black
                 )
             }
+            userInfo?.let {
+                Text(it.nick, modifier = Modifier.padding(10.dp))
+                Text(it.gender)
+                Text(it.age.toString())
+                Text(it.height.toString())
+            }
             Button(
                 modifier = Modifier
                     .padding(16.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    authenticationViewModel.logOut()
-                    navController.navigate(AUTHENTICATION_ROUTE)
+                    .fillMaxWidth(), onClick = {
+                    logOut()
+                    navController!!.navigate(AUTHENTICATION_ROUTE)
                 }, colors = ButtonColors(
                     contentColor = Cream,
                     containerColor = Bronze,

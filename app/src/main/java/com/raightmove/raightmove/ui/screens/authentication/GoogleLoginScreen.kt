@@ -3,6 +3,7 @@ package com.raightmove.raightmove.ui.screens.authentication
 import Destinations.AUTHENTICATION_ROUTE
 import Destinations.HOME_ROUTE
 import Destinations.USER_CREATION_ROUTE
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,46 +23,46 @@ import androidx.navigation.NavController
 import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
-import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
-import com.raightmove.raightmove.viewmodels.UserInfoViewModel
+import com.raightmove.raightmove.viewmodels.UserInfoUiState
 import kotlinx.coroutines.launch
 
 @Composable
 fun GoogleLoginScreen(
     navController: NavController? = null,
-    authenticationViewModel: AuthenticationViewModel,
-    userInfoViewModel: UserInfoViewModel
+    userInfo: UserInfoUiState?,
+    loginError: String?,
+    userCreationError: String?,
+    isSuccessLogin: Boolean,
+    onEnter: (Context) -> Unit,
+    getUserId: () -> String,
+    fetchUserInfo: suspend (String) -> Unit
 ) {
-    val isSuccessLogin = authenticationViewModel.isSuccessLogin.collectAsState()
-    val loginError = authenticationViewModel.error.collectAsState()
-    val userCreationError = userInfoViewModel.error.collectAsState()
-    val userInfo = userInfoViewModel.userInfo.collectAsState()
     val context = LocalContext.current
 
     var checkedUser by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        authenticationViewModel.loginUserByGoogle(context)
+        onEnter(context)
     }
 
-    LaunchedEffect(key1 = isSuccessLogin.value) {
-        if (isSuccessLogin.value) {
+    LaunchedEffect(key1 = isSuccessLogin) {
+        if (isSuccessLogin) {
             launch {
-                val userId = authenticationViewModel.userId
-                userInfoViewModel.fetchUserInfo(userId)
+                val userId = getUserId()
+                fetchUserInfo(userId)
                 checkedUser = true
             }
         }
     }
 
     when {
-        loginError.value != null || userCreationError.value != null -> {
+        loginError != null || userCreationError != null -> {
             Toast.makeText(context, "Error occurred", Toast.LENGTH_LONG).show()
             navController?.navigate(AUTHENTICATION_ROUTE)
         }
 
-        isSuccessLogin.value && checkedUser -> {
-            when (userInfo.value) {
+        isSuccessLogin && checkedUser -> {
+            when (userInfo) {
                 null -> navController?.navigate(USER_CREATION_ROUTE)
                 else -> navController?.navigate(HOME_ROUTE)
             }

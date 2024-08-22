@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -21,9 +22,9 @@ import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
 
 val exerciseIcons = mapOf(
-    "squat" to R.drawable.squat,
-    "lunges" to R.drawable.lunges,
-    "plank" to R.drawable.plank
+    "squat" to R.drawable.squat_icon,
+    "lunges" to R.drawable.lunges_icon,
+    "plank" to R.drawable.plank_icon
 )
 
 
@@ -33,6 +34,7 @@ fun PreviousTrainingButton(
 ) {
 
     return Button(
+        modifier = Modifier.padding(15.dp),
         onClick = { onClick() },
         colors = ButtonColors(
             contentColor = Cream,
@@ -47,14 +49,11 @@ fun PreviousTrainingButton(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                modifier = Modifier.size(30.dp),
-                painter = painterResource(
+                modifier = Modifier.size(30.dp), painter = painterResource(
                     id = exerciseIcons.getOrDefault(
-                        exercise,
-                        R.drawable.home_icon
+                        exercise, R.drawable.home_icon
                     )
-                ),
-                contentDescription = exercise + "icon"
+                ), contentDescription = exercise + "icon"
             )
             Text(text = exercise.uppercase())
             Column {

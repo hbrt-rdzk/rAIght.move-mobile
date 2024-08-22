@@ -29,11 +29,9 @@ class AuthenticationViewModel(
     val isSuccessLogin: StateFlow<Boolean> = _isSuccessLogin
     val error: StateFlow<String?> = _error
 
-    val currentUser = repository.currentUser
-
     val hasUser get() = repository.hasUser()
 
-    val userId get() = repository.getUserID()
+    fun getUserId() = repository.getUserID()
 
     var loginUIState by mutableStateOf(LoginUiState())
         private set

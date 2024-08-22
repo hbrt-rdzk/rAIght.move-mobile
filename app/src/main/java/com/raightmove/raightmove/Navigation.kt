@@ -8,6 +8,8 @@ import Destinations.SIGN_IN_BY_GOOGLE_ROUTE
 import Destinations.SIGN_UP_ROUTE
 import Destinations.USER_CREATION_ROUTE
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,24 +46,84 @@ fun AppNavigation() {
     val userInfoViewModel = UserInfoViewModel()
     val analysisViewModel = ExerciseAnalysisViewModel()
     val cameraViewModel = CameraViewModel()
-    val startDestination =
-        if (authenticationViewModel.hasUser) HOME_ROUTE else AUTHENTICATION_ROUTE
+    val startDestination = if (authenticationViewModel.hasUser) HOME_ROUTE else AUTHENTICATION_ROUTE
 
     NavHost(navController, startDestination = startDestination) {
         composable(AUTHENTICATION_ROUTE) {
             AuthenticationScreen(navController)
         }
         composable(SIGN_UP_ROUTE) {
-            RegisterScreen(navController, authenticationViewModel)
+            val loginUiState = authenticationViewModel.loginUIState
+            val error by authenticationViewModel.error.collectAsState()
+            val isSuccessLogin by authenticationViewModel.isSuccessLogin.collectAsState()
+            val isLoading by authenticationViewModel.isLoading.collectAsState()
+            RegisterScreen(
+                navController = navController,
+                loginUIState = loginUiState,
+                error = error,
+                isSuccessLogin = isSuccessLogin,
+                isLoading = isLoading,
+                onEnter = authenticationViewModel::resetState,
+                createUser = authenticationViewModel::createUser,
+                onUserNameChange = authenticationViewModel::onUserNameSignUp,
+                onPasswordChange = authenticationViewModel::onPasswordSignUp,
+                onPasswordConfirmationChange = authenticationViewModel::onConfirmPasswordSignUp
+            )
         }
         composable(SIGN_IN_BY_EMAIL_ROUTE) {
-            EmailLoginScreen(navController, authenticationViewModel)
+            val loginUiState = authenticationViewModel.loginUIState
+            val error by authenticationViewModel.error.collectAsState()
+            val isSuccessLogin by authenticationViewModel.isSuccessLogin.collectAsState()
+            val isLoading by authenticationViewModel.isLoading.collectAsState()
+
+            EmailLoginScreen(
+                navController = navController,
+                loginUIState = loginUiState,
+                error = error,
+                isSuccessLogin = isSuccessLogin,
+                isLoading = isLoading,
+                onEnter = authenticationViewModel::resetState,
+                loginUser = authenticationViewModel::loginUser,
+                onUserNameChange = authenticationViewModel::onUserNameChange,
+                onPasswordChange = authenticationViewModel::onPasswordChange,
+            )
         }
         composable(SIGN_IN_BY_GOOGLE_ROUTE) {
-            GoogleLoginScreen(navController, authenticationViewModel, userInfoViewModel)
+            val userInfoUiState = userInfoViewModel.userInfoUiState
+            val loginError by authenticationViewModel.error.collectAsState()
+            val userCreationError by userInfoViewModel.error.collectAsState()
+            val isSuccessLogin by authenticationViewModel.isSuccessLogin.collectAsState()
+
+            GoogleLoginScreen(
+                navController = navController,
+                userInfo = userInfoUiState,
+                loginError = loginError,
+                userCreationError = userCreationError,
+                isSuccessLogin = isSuccessLogin,
+                onEnter = authenticationViewModel::loginUserByGoogle,
+                getUserId = authenticationViewModel::getUserId,
+                fetchUserInfo = userInfoViewModel::fetchUserInfo,
+            )
         }
         composable(USER_CREATION_ROUTE) {
-            UserInfoScreen(navController, userInfoViewModel, authenticationViewModel)
+            val userInfoUIState = userInfoViewModel.userInfoUiState
+            val error by userInfoViewModel.error.collectAsState()
+            val isLoading by userInfoViewModel.isLoading.collectAsState()
+            val userInfo by userInfoViewModel.userInfo.collectAsState()
+
+            UserInfoScreen(
+                navController = navController,
+                userInfoUIState = userInfoUIState,
+                error = error,
+                isLoading = isLoading,
+                userInfo = userInfo,
+                getUserID = authenticationViewModel::getUserId,
+                createUserInfo = userInfoViewModel::addUserInfo,
+                onNickChange = userInfoViewModel::onNickChange,
+                onSexChange = userInfoViewModel::onSexChange,
+                onHeightChange = userInfoViewModel::onHeightChange,
+                onAgeChange = userInfoViewModel::onAgeChange
+            )
         }
 
         composable(CAMERA_ROUTE) {
@@ -71,10 +133,23 @@ fun AppNavigation() {
             HomeScreen(navController)
         }
         composable(CALENDAR_ROUTE) {
-            CalendarScreen(navController)
+            val trainings by userInfoViewModel.userTrainings.collectAsState()
+
+            CalendarScreen(
+                navController = navController,
+                trainings = trainings,
+                getUserID = authenticationViewModel::getUserId,
+                fetchTraining = userInfoViewModel::fetchTrainings
+            )
         }
         composable(PROFILE_ROUTE) {
-            ProfileScreen(navController, authenticationViewModel)
+            val userInfo by userInfoViewModel.userInfo.collectAsState()
+
+            ProfileScreen(
+                navController = navController,
+                userInfo = userInfo,
+                logOut = authenticationViewModel::logOut
+            )
         }
     }
 }

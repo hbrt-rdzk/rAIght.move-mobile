@@ -1,6 +1,7 @@
 package com.raightmove.raightmove.ui.screens.authentication
 
 import Destinations.HOME_ROUTE
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,39 +17,46 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.raightmove.raightmove.R
 import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
-import com.raightmove.raightmove.viewmodels.AuthenticationViewModel
+import com.raightmove.raightmove.ui.themes.DarkBronze
+import com.raightmove.raightmove.viewmodels.LoginUiState
 
 @Composable
 fun EmailLoginScreen(
     navController: NavController? = null,
-    authenticationViewModel: AuthenticationViewModel
+    loginUIState: LoginUiState,
+    error: String?,
+    isLoading: Boolean,
+    isSuccessLogin: Boolean,
+    onEnter: () -> Unit,
+    loginUser: (Context) -> Unit,
+    onUserNameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
 ) {
-    authenticationViewModel.resetState()
+    LaunchedEffect(Unit) {
+        onEnter()
+    }
 
-    val loginError = authenticationViewModel.error.collectAsState()
-    val isLoading = authenticationViewModel.isLoading.collectAsState()
-    val isSuccessLogin = authenticationViewModel.isSuccessLogin.collectAsState()
-
-    val loginUiState = authenticationViewModel.loginUIState
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -60,6 +68,16 @@ fun EmailLoginScreen(
                 .aspectRatio(1f),
             tint = Color.Unspecified
         )
+        Text(
+            text = "Log into account",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Normal,
+            color = DarkBronze,
+            modifier = Modifier
+                .padding(top = 30.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -69,12 +87,12 @@ fun EmailLoginScreen(
         ) {
 
             OutlinedTextField(
-                value = loginUiState.userName,
-                onValueChange = { authenticationViewModel.onUserNameChange(it) },
+                value = loginUIState.userName,
+                onValueChange = { onUserNameChange(it) },
                 label = { Text("Email") },
                 textStyle = TextStyle(color = Bronze),
                 modifier = Modifier.fillMaxWidth(),
-                isError = loginError.value != null,
+                isError = error != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Bronze,
@@ -83,13 +101,13 @@ fun EmailLoginScreen(
                 )
             )
             OutlinedTextField(
-                value = loginUiState.password,
-                onValueChange = { authenticationViewModel.onPasswordChange(it) },
+                value = loginUIState.password,
+                onValueChange = { onPasswordChange(it) },
                 label = { Text("Password (6+ characters)") },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(color = Bronze),
                 visualTransformation = PasswordVisualTransformation(),
-                isError = loginError.value != null,
+                isError = error != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Bronze,
@@ -97,23 +115,21 @@ fun EmailLoginScreen(
                     unfocusedBorderColor = Bronze
                 )
             )
-            if (loginError.value != null) {
+            if (error != null) {
                 Text(
-                    text = loginError.value.toString(),
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    text = error.toString(),
                     color = Color.Red
                 )
             }
-            if (isLoading.value) {
+            if (isLoading) {
                 ProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    authenticationViewModel.loginUser(context)
-                },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = ButtonColors(
+                    loginUser(context)
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonColors(
                     contentColor = Cream,
                     containerColor = Bronze,
                     disabledContentColor = Color.Black,
@@ -122,7 +138,7 @@ fun EmailLoginScreen(
             ) {
                 Text("Continue")
             }
-            if (isSuccessLogin.value) {
+            if (isSuccessLogin) {
                 navController?.navigate(HOME_ROUTE)
             }
         }
