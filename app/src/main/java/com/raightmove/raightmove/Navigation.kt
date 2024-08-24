@@ -10,6 +10,7 @@ import Destinations.USER_CREATION_ROUTE
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -127,7 +128,33 @@ fun AppNavigation() {
         }
 
         composable(CAMERA_ROUTE) {
-            CameraScreen(navController, analysisViewModel, cameraViewModel)
+            val exercise by analysisViewModel.exercise.collectAsState()
+            val state by analysisViewModel.analysisState.collectAsState()
+            val landmarks by analysisViewModel.currentLandmarks.observeAsState()
+            val videoLandmarks = analysisViewModel.videoLandmarks
+            val joints by analysisViewModel.joints.collectAsState()
+            val feedbacks by analysisViewModel.feedbacks.collectAsState()
+
+            CameraScreen(
+                navController = navController,
+                exercise = exercise,
+                state = state,
+                landmarks = landmarks,
+                videoLandmarks = videoLandmarks,
+                joints = joints,
+                feedbacks = feedbacks,
+                startCamera = cameraViewModel::startCamera,
+                processImage = analysisViewModel::processImageProxy,
+                stopCamera = cameraViewModel::stopCamera,
+                setPreviewView = cameraViewModel::setPreviewView,
+                fetchFeedback = analysisViewModel::fetchFeedback,
+                setJoints = analysisViewModel::setJoints,
+                setFeedback = analysisViewModel::setFeedback,
+                setState = analysisViewModel::setState,
+                setExercise = analysisViewModel::setExercise,
+                getUserID = authenticationViewModel::getUserId,
+                addTraining = userInfoViewModel::addTraining,
+            )
         }
         composable(HOME_ROUTE) {
             HomeScreen(navController)

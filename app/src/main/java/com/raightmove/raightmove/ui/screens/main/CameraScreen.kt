@@ -2,10 +2,13 @@ package com.raightmove.raightmove.ui.screens.main
 
 import Destinations.CAMERA_ROUTE
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.ImageProxy
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -25,8 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import com.raightmove.raightmove.models.AnalysisRequestBody
+import com.raightmove.raightmove.models.Feedback
+import com.raightmove.raightmove.models.Joint
+import com.raightmove.raightmove.models.Training
 import com.raightmove.raightmove.ui.components.BottomMainNavBar
 import com.raightmove.raightmove.ui.components.analysis.ExercisePreview
 import com.raightmove.raightmove.ui.components.analysis.GetReview
@@ -34,36 +40,48 @@ import com.raightmove.raightmove.ui.components.analysis.PickExercise
 import com.raightmove.raightmove.ui.components.analysis.SelectExercisePrompt
 import com.raightmove.raightmove.ui.components.analysis.SendLandmarksForReviewButton
 import com.raightmove.raightmove.ui.components.analysis.ShowReview
-import com.raightmove.raightmove.viewmodels.CameraViewModel
-import com.raightmove.raightmove.viewmodels.ExerciseAnalysisViewModel
+import kotlin.reflect.KFunction2
 
 @Composable
 fun CameraScreen(
     navController: NavController,
-    analysisViewModel: ExerciseAnalysisViewModel = viewModel(),
-    cameraViewModel: CameraViewModel = viewModel()
+    exercise: String?,
+    state: String,
+    landmarks: PoseLandmarkerResult?,
+    videoLandmarks: MutableList<PoseLandmarkerResult>,
+    joints: List<Joint>?,
+    feedbacks: List<Feedback>?,
+    startCamera: KFunction2<Context, (Context, ImageProxy) -> Unit, Unit>,
+    processImage: (Context, ImageProxy) -> Unit,
+    stopCamera: () -> Unit,
+    setPreviewView: (PreviewView) -> Unit,
+    fetchFeedback: suspend (AnalysisRequestBody) -> String,
+    setJoints: (List<Joint>) -> Unit,
+    setFeedback: (String) -> Unit,
+    setState: (String) -> Unit,
+    setExercise: (String) -> Unit,
+    getUserID: () -> String,
+    addTraining: (Context, String, Training) -> Unit
 ) {
     val context = LocalContext.current
-    val state = analysisViewModel.analysisState.collectAsState()
 
-    val cameraPermissionResult =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(),
-            onResult = { granted ->
-                if (granted) {
-                    cameraViewModel.startCamera(context, analysisViewModel)
-                } else {
-                    Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
-                }
-            })
+    val cameraPermissionResult = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            if (granted) {
+                startCamera(context, processImage)
+            } else {
+                Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+            }
+        })
 
     Scaffold(bottomBar = { BottomMainNavBar(CAMERA_ROUTE, navController) }) { padding ->
         SideEffect {
             if (ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.CAMERA
+                    context, Manifest.permission.CAMERA
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                cameraViewModel.startCamera(context, analysisViewModel)
+                startCamera(context, processImage)
             } else {
                 cameraPermissionResult.launch(Manifest.permission.CAMERA)
             }
@@ -93,16 +111,34 @@ fun CameraScreen(
                     .weight(1f)
                     .padding(padding)
             ) {
-                when (state.value) {
+                when (state) {
                     "pick_exercise" -> SelectExercisePrompt()
-                    "video_analysis" -> ExercisePreview(cameraViewModel, analysisViewModel)
+                    "video_analysis" -> ExercisePreview(
+                        landmarks = landmarks,
+                        videoLandmarks = videoLandmarks,
+                        setPreviewView = setPreviewView
+                    )
+
                     "send_for_review" -> {
-                        cameraViewModel.stopCamera()
-                        GetReview(analysisViewModel)
+                        stopCamera()
+                        GetReview(
+                            exercise = exercise!!,
+                            videoLandmarks = videoLandmarks,
+                            fetchFeedback = fetchFeedback,
+                            setState = setState,
+                            setJoints = setJoints,
+                            setFeedback = setFeedback
+                        )
                     }
 
                     "review" -> {
-                        ShowReview(analysisViewModel)
+                        ShowReview(
+                            exercise = exercise!!,
+                            joints = joints,
+                            feedbacks = feedbacks,
+                            getUserID = getUserID,
+                            addTraining = addTraining,
+                        )
                     }
                 }
             }
@@ -111,10 +147,15 @@ fun CameraScreen(
                     .weight(1f)
                     .padding(padding)
             ) {
-                when (state.value) {
-                    "pick_exercise" -> PickExercise(analysisViewModel)
+                when (state) {
+                    "pick_exercise" -> PickExercise(
+                        setState = setState, setExercise = setExercise
+                    )
+
                     "video_analysis" -> {
-                        SendLandmarksForReviewButton(analysisViewModel)
+                        SendLandmarksForReviewButton(
+                            setState = setState, currentLandmarks = landmarks
+                        )
                     }
 
                     "review" -> {}
@@ -123,6 +164,3 @@ fun CameraScreen(
         }
     }
 }
-
-
-

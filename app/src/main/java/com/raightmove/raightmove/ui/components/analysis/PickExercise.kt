@@ -12,10 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.raightmove.raightmove.ui.themes.Bronze
 import com.raightmove.raightmove.ui.themes.Cream
-import com.raightmove.raightmove.viewmodels.ExerciseAnalysisViewModel
 
 @Composable
-fun PickExercise(analysisViewModel: ExerciseAnalysisViewModel) {
+fun PickExercise(
+    setState: (String) -> Unit, setExercise: (String) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -23,8 +24,8 @@ fun PickExercise(analysisViewModel: ExerciseAnalysisViewModel) {
     ) {
         Button(
             onClick = {
-                analysisViewModel.setExercise("squat")
-                analysisViewModel.setState("video_analysis")
+                setExercise("squat")
+                setState("video_analysis")
             }, colors = ButtonColors(
                 contentColor = Cream,
                 containerColor = Bronze,
@@ -36,8 +37,8 @@ fun PickExercise(analysisViewModel: ExerciseAnalysisViewModel) {
         }
         Button(
             onClick = {
-                analysisViewModel.setExercise("lunges")
-                analysisViewModel.setState("video_analysis")
+                setExercise("lunges")
+                setState("video_analysis")
             }, colors = ButtonColors(
                 contentColor = Cream,
                 containerColor = Bronze,
@@ -49,8 +50,8 @@ fun PickExercise(analysisViewModel: ExerciseAnalysisViewModel) {
         }
         Button(
             onClick = {
-                analysisViewModel.setExercise("plank")
-                analysisViewModel.setState("video_analysis")
+                setExercise("plank")
+                setState("video_analysis")
             }, colors = ButtonColors(
                 contentColor = Cream,
                 containerColor = Bronze,

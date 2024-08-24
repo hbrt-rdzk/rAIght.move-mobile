@@ -3,6 +3,7 @@ package com.raightmove.raightmove.viewmodels
 import android.content.Context
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -20,7 +21,7 @@ class CameraViewModel : ViewModel() {
         previewViewRef = WeakReference(previewView)
     }
 
-    fun startCamera(context: Context, analysisViewModel: ExerciseAnalysisViewModel) {
+    fun startCamera(context: Context, processImageProxy: (Context, ImageProxy) -> Unit) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
@@ -36,7 +37,7 @@ class CameraViewModel : ViewModel() {
                     .build()
                     .also {
                         it.setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
-                            analysisViewModel.processImageProxy(imageProxy, context)
+                            processImageProxy(context, imageProxy)
                         }
                     }
 

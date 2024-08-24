@@ -4,24 +4,21 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
-import com.raightmove.raightmove.viewmodels.CameraViewModel
-import com.raightmove.raightmove.viewmodels.ExerciseAnalysisViewModel
 
 @Composable
 fun DrawLandmarks(
     landmarks: PoseLandmarkerResult?,
-    analysisViewModel: ExerciseAnalysisViewModel
+    videoLandmarks: MutableList<PoseLandmarkerResult>
 ) {
     landmarks?.let {
         if (it.landmarks().isNotEmpty()) {
             val landmarksData = it.landmarks()[0]
-            analysisViewModel.videoLandmarks.add(it)
+            videoLandmarks.add(it)
             Canvas(modifier = Modifier.fillMaxSize()) {
                 landmarksData.forEach { landmark ->
                     val visibility = landmark.visibility().orElse(0.0F)
@@ -43,16 +40,16 @@ fun DrawLandmarks(
 
 @Composable
 fun ExercisePreview(
-    cameraViewModel: CameraViewModel,
-    analysisViewModel: ExerciseAnalysisViewModel,
+    landmarks: PoseLandmarkerResult?,
+    videoLandmarks: MutableList<PoseLandmarkerResult>,
+    setPreviewView: (PreviewView) -> Unit,
 ) {
-    val landmarks = analysisViewModel.currentLandmarks.observeAsState()
     AndroidView(factory = { context ->
         PreviewView(context).apply {
             id = PreviewView.generateViewId()
-            cameraViewModel.setPreviewView(this)
+            setPreviewView(this)
         }
     }, modifier = Modifier.fillMaxSize())
 
-    DrawLandmarks(landmarks.value, analysisViewModel)
+    DrawLandmarks(landmarks, videoLandmarks)
 }

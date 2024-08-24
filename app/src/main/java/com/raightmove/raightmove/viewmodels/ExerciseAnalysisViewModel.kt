@@ -36,7 +36,7 @@ class ExerciseAnalysisViewModel(
     var videoLandmarks = mutableListOf<PoseLandmarkerResult>()
     val currentLandmarks: LiveData<PoseLandmarkerResult?> = _landmarks
     val joints: StateFlow<List<Joint>?> = _joints
-    val feedback: StateFlow<List<Feedback>?> = _feedback
+    val feedbacks: StateFlow<List<Feedback>?> = _feedback
 
     fun setExercise(exercise: String) {
         _exercise.value = exercise
@@ -59,7 +59,7 @@ class ExerciseAnalysisViewModel(
         return repository.fetchFeedback(analysisData)
     }
 
-    fun processImageProxy(imageProxy: ImageProxy, context: Context) {
+    fun processImageProxy(context: Context, imageProxy: ImageProxy) {
         viewModelScope.launch(Dispatchers.Default) {
             val bitmapImage = imageProxy.toBitmap()
 
