@@ -1,3 +1,4 @@
+
 import Destinations.AUTHENTICATION_ROUTE
 import Destinations.CALENDAR_ROUTE
 import Destinations.CAMERA_ROUTE
@@ -10,7 +11,6 @@ import Destinations.USER_CREATION_ROUTE
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -130,7 +130,7 @@ fun AppNavigation() {
         composable(CAMERA_ROUTE) {
             val exercise by analysisViewModel.exercise.collectAsState()
             val state by analysisViewModel.analysisState.collectAsState()
-            val landmarks by analysisViewModel.currentLandmarks.observeAsState()
+            val landmarksSource = analysisViewModel.currentLandmarks
             val videoLandmarks = analysisViewModel.videoLandmarks
             val joints by analysisViewModel.joints.collectAsState()
             val feedbacks by analysisViewModel.feedbacks.collectAsState()
@@ -139,7 +139,7 @@ fun AppNavigation() {
                 navController = navController,
                 exercise = exercise,
                 state = state,
-                landmarks = landmarks,
+                landmarksSource = landmarksSource,
                 videoLandmarks = videoLandmarks,
                 joints = joints,
                 feedbacks = feedbacks,

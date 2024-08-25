@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import com.raightmove.raightmove.models.AnalysisRequestBody
@@ -47,7 +48,7 @@ fun CameraScreen(
     navController: NavController,
     exercise: String?,
     state: String,
-    landmarks: PoseLandmarkerResult?,
+    landmarksSource: LiveData<PoseLandmarkerResult?>,
     videoLandmarks: MutableList<PoseLandmarkerResult>,
     joints: List<Joint>?,
     feedbacks: List<Feedback>?,
@@ -114,7 +115,7 @@ fun CameraScreen(
                 when (state) {
                     "pick_exercise" -> SelectExercisePrompt()
                     "video_analysis" -> ExercisePreview(
-                        landmarks = landmarks,
+                        landmarksSource = landmarksSource,
                         videoLandmarks = videoLandmarks,
                         setPreviewView = setPreviewView
                     )
@@ -154,7 +155,7 @@ fun CameraScreen(
 
                     "video_analysis" -> {
                         SendLandmarksForReviewButton(
-                            setState = setState, currentLandmarks = landmarks
+                            setState = setState, landmarksSource = landmarksSource
                         )
                     }
 

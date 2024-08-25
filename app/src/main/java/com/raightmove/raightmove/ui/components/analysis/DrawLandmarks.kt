@@ -4,10 +4,13 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.LiveData
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 
 @Composable
@@ -40,10 +43,11 @@ fun DrawLandmarks(
 
 @Composable
 fun ExercisePreview(
-    landmarks: PoseLandmarkerResult?,
+    landmarksSource: LiveData<PoseLandmarkerResult?>,
     videoLandmarks: MutableList<PoseLandmarkerResult>,
     setPreviewView: (PreviewView) -> Unit,
 ) {
+    val landmarks by landmarksSource.observeAsState()
     AndroidView(factory = { context ->
         PreviewView(context).apply {
             id = PreviewView.generateViewId()
