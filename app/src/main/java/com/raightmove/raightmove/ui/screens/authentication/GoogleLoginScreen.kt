@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.raightmove.raightmove.ui.components.ProgressIndicator
 import com.raightmove.raightmove.ui.themes.Bronze
@@ -85,3 +86,18 @@ fun GoogleLoginScreen(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewGoogleLoginScreenPreview() {
+    GoogleLoginScreen(
+        userInfo = null,
+        loginError = null,
+        userCreationError = null,
+        isSuccessLogin = false,
+        onEnter = {},
+        getUserId = { "" },
+        fetchUserInfo = {}
+    )
+}
+

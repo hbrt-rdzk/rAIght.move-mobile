@@ -13,33 +13,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LiveData
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 
-@Composable
-fun DrawLandmarks(
-    landmarks: PoseLandmarkerResult?,
-    videoLandmarks: MutableList<PoseLandmarkerResult>
-) {
-    landmarks?.let {
-        if (it.landmarks().isNotEmpty()) {
-            val landmarksData = it.landmarks()[0]
-            videoLandmarks.add(it)
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                landmarksData.forEach { landmark ->
-                    val visibility = landmark.visibility().orElse(0.0F)
-                    if (visibility >= 0.5) {
-                        drawCircle(
-                            color = Color.Red,
-                            radius = 20f,
-                            center = Offset(
-                                y = landmark.x() * size.width,
-                                x = (1 - landmark.y()) * size.width
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun ExercisePreview(
@@ -56,4 +29,28 @@ fun ExercisePreview(
     }, modifier = Modifier.fillMaxSize())
 
     DrawLandmarks(landmarks, videoLandmarks)
+}
+
+@Composable
+fun DrawLandmarks(
+    landmarks: PoseLandmarkerResult?, videoLandmarks: MutableList<PoseLandmarkerResult>
+) {
+    landmarks?.let {
+        if (it.landmarks().isNotEmpty()) {
+            val landmarksData = it.landmarks()[0]
+            videoLandmarks.add(it)
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                landmarksData.forEach { landmark ->
+                    val visibility = landmark.visibility().orElse(0.0F)
+                    if (visibility >= 0.5) {
+                        drawCircle(
+                            color = Color.Red, radius = 20f, center = Offset(
+                                y = landmark.x() * size.width, x = (1 - landmark.y()) * size.width
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

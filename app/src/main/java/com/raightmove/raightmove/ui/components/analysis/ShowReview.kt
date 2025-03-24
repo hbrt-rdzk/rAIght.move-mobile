@@ -35,7 +35,7 @@ fun ShowReview(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(feedbacks!!.get(0).toString())
+        Text(feedbacks!![0].toString())
         Button(
             onClick = {
                 val current = LocalDateTime.now()

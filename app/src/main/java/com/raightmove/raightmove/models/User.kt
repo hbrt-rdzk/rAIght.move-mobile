@@ -4,6 +4,6 @@ data class User(
     val nick: String = "",
     val age: Int = 0,
     val gender: String = "",
-    val height: Int = 0,
+    var height: Int = 0,
     val trainings: List<String> = emptyList()
 )

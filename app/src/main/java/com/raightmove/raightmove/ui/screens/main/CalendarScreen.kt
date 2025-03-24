@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -30,7 +31,7 @@ import com.raightmove.raightmove.ui.components.ProgressIndicator
 
 @Composable
 fun CalendarScreen(
-    navController: NavController,
+    navController: NavController? = null,
     trainings: List<Training>?,
     getUserID: () -> String,
     fetchTraining: suspend (String) -> Unit
@@ -85,4 +86,14 @@ fun CalendarScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCalendarScreen() {
+    CalendarScreen(
+        trainings = emptyList(),
+        getUserID = { "" },
+        fetchTraining = {}
+    )
 }

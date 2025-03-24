@@ -1,4 +1,3 @@
-
 import Destinations.AUTHENTICATION_ROUTE
 import Destinations.CALENDAR_ROUTE
 import Destinations.CAMERA_ROUTE
@@ -130,10 +129,10 @@ fun AppNavigation() {
         composable(CAMERA_ROUTE) {
             val exercise by analysisViewModel.exercise.collectAsState()
             val state by analysisViewModel.analysisState.collectAsState()
-            val landmarksSource = analysisViewModel.currentLandmarks
-            val videoLandmarks = analysisViewModel.videoLandmarks
             val joints by analysisViewModel.joints.collectAsState()
             val feedbacks by analysisViewModel.feedbacks.collectAsState()
+            val landmarksSource = analysisViewModel.currentLandmarks
+            val videoLandmarks = analysisViewModel.videoLandmarks
 
             CameraScreen(
                 navController = navController,

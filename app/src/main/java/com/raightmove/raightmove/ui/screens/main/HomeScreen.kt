@@ -12,16 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.raightmove.raightmove.ui.components.BottomMainNavBar
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    Scaffold(
-        bottomBar = { BottomMainNavBar(HOME_ROUTE, navController) }
-    ) { padding ->
+fun HomeScreen(navController: NavController? = null) {
+    Scaffold(bottomBar = { BottomMainNavBar(HOME_ROUTE, navController) }) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -40,4 +39,10 @@ fun HomeScreen(navController: NavController) {
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHomeScreen() {
+    HomeScreen()
 }

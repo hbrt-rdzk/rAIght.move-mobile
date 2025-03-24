@@ -149,7 +149,7 @@ fun AuthenticationScreen(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewStartScreen() {
     AuthenticationScreen()
